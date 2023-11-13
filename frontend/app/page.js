@@ -8,6 +8,7 @@ export default function Home() {
   const [clientId, setClientId] = useState(null);
   const [gameId, setGameId] = useState(null);
   const [game, setGame] = useState(null);
+  const [winner, setWinner] = useState(null);
 
   useEffect(() => {
     // Initialize WebSocket connection
@@ -34,6 +35,10 @@ export default function Home() {
       // join
       if (response.method === "join"){
         setGame(response.game);
+      }
+
+      if (response.method === "submit"){
+        setWinner(response.winner);
       }
 
       // Here you can handle the WebSocket messages
@@ -68,14 +73,11 @@ export default function Home() {
     }
   }, [game]);
 
-  // Function to send messages to the WebSocket server
-  const sendMessageToServer = (messageObject) => {
-    console.log(ws.current && ws.current.readyState === WebSocket.OPEN);
-    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-        ws.current.send(JSON.stringify(messageObject));
-        console.log(messageObject);
+  useEffect(() => {
+    if (winner) {
+      console.log("Winner set successfully");
     }
-  };
+  }, [winner]);
 
   const handleCreateGame = () => {
     const payload = {
@@ -94,6 +96,15 @@ export default function Home() {
     ws.current.send(JSON.stringify(payload));
   };
 
+  const handleSubmit = () => {
+    const payload = {
+        "method": "submit",
+        "clientId": clientId,
+        "gameId": gameId,
+    };
+    ws.current.send(JSON.stringify(payload));
+  };
+
   // Rest of your component's logic and state
 
   return (
@@ -105,12 +116,14 @@ export default function Home() {
         <div>
         {game?.clients.map((c) => (
           <div key={c.clientId} style={{ width: '200px'}}>
-            {c.clientId}
+            client: {c.clientId}
           </div>
         ))}
         </div>
-        <button onClick={() => sendMessageToServer({ action: 'start_game' })}>Start Game</button>
-        <button onClick={() => sendMessageToServer({ action: 'end_game' })}>End Game</button>
+        <button onClick={handleSubmit}>Submit</button>
+        {game && winner && (
+        <p>{winner === clientId ? "You win!" : "You lose."}</p>
+      )}
     </div>
   );
 }

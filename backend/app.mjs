@@ -45,7 +45,7 @@ webSocket.on("connection", (ws, request) => {
             const gameId = guid();
             games[gameId] = {
                 "id": gameId,
-                "clients": []
+                "clients": [],        
             }
 
             const payload = {
@@ -64,7 +64,7 @@ webSocket.on("connection", (ws, request) => {
 
             // max num of players is 2
             if (game.clients && game.clients.length < 2){
-                game.clients.push({"clientId": clientId});
+                game.clients.push({"clientId": clientId, "submits": 0});
 
                 const payLoad = {
                     "method": "join",
@@ -74,6 +74,33 @@ webSocket.on("connection", (ws, request) => {
                 game.clients.forEach(client => {
                     clients[client.clientId].connection.send(JSON.stringify(payLoad));
                 });
+            }
+        }
+
+        if (result.method === "submit"){
+            const clientId = result.clientId;
+            const gameId = result.gameId;
+            const game = games[gameId];
+            if (game){
+                const clientIndex = game.clients.findIndex(c => c.clientId === clientId);
+
+                if (clientIndex !== -1){
+                    game.clients[clientIndex].submits++;
+
+                    if (game.clients[clientIndex].submits >= 3){
+                        const payLoad = {
+                            "method": "submit",
+                            "game": game,
+                            "winner": clientId
+                        }
+    
+                        game.clients.forEach(client => {
+                            clients[client.clientId].connection.send(JSON.stringify(payLoad));
+                        });
+                        
+                        delete games[gameId];
+                    }
+                }
             }
         }
     });
