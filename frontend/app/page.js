@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react';
 
-const wsUrl = 'ws://localhost:4000'; // Replace with your WebSocket server's address
+const wsUrl = 'ws://localhost:4000'; 
 
 export default function Home() {
   const ws = useRef(null);
@@ -40,9 +40,6 @@ export default function Home() {
       if (response.method === "submit"){
         setWinner(response.winner);
       }
-
-      // Here you can handle the WebSocket messages
-      // For example, you can update the state if you keep track of game status or messages
     };
 
     newWs.onclose = () => {
@@ -104,8 +101,6 @@ export default function Home() {
     };
     ws.current.send(JSON.stringify(payload));
   };
-
-  // Rest of your component's logic and state
 
   return (
     <div className='main-body'>
