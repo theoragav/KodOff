@@ -2,7 +2,7 @@
 
 import  React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signUp, login } from "../api/api.mjs";
+import { signUp, login, logOut, loggedInUser } from "../api/api.mjs";
 import "./styles.css";
 
 export default function Page() {
@@ -10,53 +10,41 @@ export default function Page() {
   const [user, setUser] = useState({});
 
   useEffect(() => {
+    loggedInUser().then((data) => {
+        if (data) setUser(data);
+        else router.push('/login');
+    });
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     const code = urlParams.get("code"); 
-    if (code) {
-        login(code);
-    }
-    async function loggedInUser() {
-      await fetch(`http://localhost:4000/user/`, {
-        method: "GET",
-        headers: {"Content-Type": "application/json"},
-        body: null,
-        credentials: 'include',
-      }).then((response) => {
-        return response.json();
-      }).then((data) => {
-        if (data) {
+    const state = urlParams.get("state"); 
+    if (code && state) {
+      if (state === 'login') {
+        login(code).then((data) => {
           setUser(data);
-        }
-      });
+          router.replace('/');
+        });
+      } else if (state === 'signup') {
+        signUp(code).then((data) => {
+          setUser(data);
+          router.replace('/');
+        });
+      }
     }
-    loggedInUser();
-
-    // if (Object.keys(user).length === 0) {
-    //   console.log(user);
-    //   router.push('/login');
-    // }
   }, []);
 
-  // async function logOut() {
-  //   await fetch(`http://localhost:4000/logout/`, {
-  //     method: "GET",
-  //     headers: {"Content-Type": "application/json"},
-  //     body: null,
-  //     credentials: 'include',
-  //   }).then((response) => {
-  //     return response.json();
-  //   }).then((data) => {
-  //     console.log(data);
-  //   });
-  // }
+  function logOutAccount() {
+    logOut();
+    setUser({});
+    router.push('/login');
+  }
 
   return (
     <div className="container-fluid Access_Card mt-5">
       <div className="row d-flex px-4 py-5 gx-5">
           <div className="col-md-5 d-flex flex-column text-break text-center justify-content-center Main_LeftContainer">
             <div className="d-flex flex-column align-items-center Main_Access">
-              <button type="submit" className="mb-2 Main_Btn">
+              <button type="submit" className="mb-2 Main_Btn" onClick={logOutAccount}>
                 <i className="bi bi-box-arrow-in-right Main_Icon"></i>
                 Log Out
               </button>

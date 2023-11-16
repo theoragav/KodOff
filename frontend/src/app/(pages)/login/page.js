@@ -10,7 +10,7 @@ const GITHUB_REDIRECT_URI = "http://localhost:3000/";
 export function Login() {
 
   function redirectToGithub() {
-    window.location.assign(`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_REDIRECT_URI}&scope=user`);
+    window.location.assign(`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_REDIRECT_URI}&scope=user&state=login`);
   }
 
   return (

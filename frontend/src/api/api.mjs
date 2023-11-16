@@ -9,19 +9,7 @@ function send(method, url, data){
 }
 
 export async function signUp(code) {
-  await fetch(`http://localhost:4000/signUp/`, {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ code: code })
-  }).then((response) => {
-    return response.json();
-  }).then((data) => {
-    return data;
-  });
-}
-
-export async function login(code) {
-  await fetch(`http://localhost:4000/login/`, {
+  return await fetch(`http://localhost:4000/signUp/`, {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({ code: code }),
@@ -33,20 +21,37 @@ export async function login(code) {
   });
 }
 
-export async function logOut() {
-  await fetch(`http://localhost:4000/logout/`, {
-    method: "GET",
+export async function login(code) {
+  return await fetch(`http://localhost:4000/login/`, {
+    method: "POST",
     headers: {"Content-Type": "application/json"},
-    body: null,
+    body: JSON.stringify({ code: code }),
+    credentials: 'include',
   }).then((response) => {
     return response.json();
   }).then((data) => {
-    console.log(data);
+    return data;
+  });
+}
+
+export function logOut() {
+  fetch(`http://localhost:4000/logout/`, {
+    method: 'GET',
+    headers: {"Content-Type": "application/json"},
+    credentials: 'include',
+  })
+  .then(response => {
+    if (response.ok) {
+      router.push('/login');
+    }
+  })
+  .catch(error => {
+    console.error(error);
   });
 }
 
 export async function loggedInUser() {
-  await fetch(`http://localhost:4000/user/`, {
+  return await fetch(`http://localhost:4000/user/`, {
     method: "GET",
     headers: {"Content-Type": "application/json"},
     body: null,
@@ -54,7 +59,6 @@ export async function loggedInUser() {
   }).then((response) => {
     return response.json();
   }).then((data) => {
-    console.log(data);
     return data;
   });
 }
