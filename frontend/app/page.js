@@ -9,6 +9,7 @@ export default function Home() {
   const [gameId, setGameId] = useState(null);
   const [game, setGame] = useState(null);
   const [winner, setWinner] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(null);
 
   useEffect(() => {
     // Initialize WebSocket connection
@@ -38,7 +39,18 @@ export default function Home() {
       }
 
       if (response.method === "submit"){
+        setGame(response.game);
         setWinner(response.winner);
+      }
+
+      if (response.method === "end"){
+        setGame(response.game);
+        setWinner(response.winner);
+      }
+
+      // Handle timer updates
+      if (response.method === "timer") {
+        setTimeLeft(response.timeLeft);
       }
     };
 
@@ -75,6 +87,12 @@ export default function Home() {
       console.log("Winner set successfully");
     }
   }, [winner]);
+
+  useEffect(() => {
+    if (timeLeft !== null) {
+      console.log("Timer updated: " + timeLeft + " milliseconds remaining");
+    }
+  }, [timeLeft]);
 
   const handleCreateGame = () => {
     const payload = {
@@ -115,10 +133,18 @@ export default function Home() {
           </div>
         ))}
         </div>
+        {timeLeft !== null && (
+          <div>
+            Time Left: {Math.floor(timeLeft / 1000)} seconds
+          </div>
+        )}
         <button onClick={handleSubmit}>Submit</button>
         {game && winner && (
-        <p>{winner === clientId ? "You win!" : "You lose."}</p>
-      )}
+          <p>
+              {winner === clientId ? "You win!" : 
+              winner === "tie" ? "It's a tie!" : "You lose."}
+          </p>
+        )}
     </div>
   );
 }

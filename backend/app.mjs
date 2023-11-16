@@ -19,12 +19,78 @@ app.use(function (req, res, next) {
 
 const clients = {};
 const games = {};
+const timers = {};
+
 const server = createServer(app).listen(PORT, function (err) {
     if (err) console.log(err);
     else console.log("HTTP server on http://localhost:%s", PORT);
 });
 
 const webSocket = new WebSocketServer({ server });
+
+function startTimer(gameId, durationInSeconds) {
+    const endTime = Date.now() + durationInSeconds * 1000;
+
+    // Update game state
+    games[gameId].endTime = endTime;
+
+    // Send an immediate timer update to clients
+    sendTimeUpdateToClients(gameId, durationInSeconds * 1000);
+
+    // Periodic updates
+    const updateInterval = setInterval(() => {
+        const remainingTime = Math.max(endTime - Date.now(), 0);
+        sendTimeUpdateToClients(gameId, remainingTime);
+
+        // End of timer
+        if (remainingTime <= 0) {
+            clearInterval(updateInterval);
+            evaluateWinneronTimerEnd(gameId);
+        }
+    }, 950); // Update every second
+}
+
+// helpers 
+function sendTimeUpdateToClients(gameId, remainingTime) {
+    const payload = {
+        "method": "timer",
+        "timeLeft": remainingTime
+    };
+    games[gameId].clients.forEach(client => {
+        clients[client.clientId].connection.send(JSON.stringify(payload));
+    });
+}
+
+function evaluateWinneronTimerEnd(gameId) {
+    const game = games[gameId];
+    let winnerId = null;
+
+    if (game.clients[0].submits > game.clients[1].submits) {
+        winnerId = game.clients[0].clientId;
+    } else if (game.clients[1].submits > game.clients[0].submits) {
+        winnerId = game.clients[1].clientId;
+    } else if (game.clients[1].submits === game.clients[0].submits){
+        winnerId = "tie"
+    }
+
+    const payload = {
+        "method": "end",
+        "game": game,
+        "winner": winnerId
+    };
+
+    game.clients.forEach(client => {
+        clients[client.clientId].connection.send(JSON.stringify(payload));
+    });
+
+    // Clean up the game state
+    delete games[gameId];
+    // Clear the timer if necessary
+    if (timers[gameId] && timers[gameId].updateInterval) {
+        clearInterval(timers[gameId].updateInterval);
+        delete timers[gameId];
+    }
+}
 
 webSocket.on("connection", (ws, request) => {
     const clientId = guid();
@@ -74,6 +140,12 @@ webSocket.on("connection", (ws, request) => {
                 game.clients.forEach(client => {
                     clients[client.clientId].connection.send(JSON.stringify(payLoad));
                 });
+
+                // If this is the second player joining, start the timer after notification
+                if (game.clients.length === 2) {
+                    // Start the game timer here
+                    startTimer(gameId, 10); // Assuming a 10-second game for example
+                }
             }
         }
 
@@ -97,6 +169,13 @@ webSocket.on("connection", (ws, request) => {
                         game.clients.forEach(client => {
                             clients[client.clientId].connection.send(JSON.stringify(payLoad));
                         });
+
+                        // Clear the game timer
+                        const gameTimer = timers[gameId]?.updateInterval;
+                        if (gameTimer) {
+                            clearInterval(gameTimer);
+                            delete timers[gameId];
+                        }
                         
                         delete games[gameId];
                     }
