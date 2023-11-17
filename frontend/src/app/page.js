@@ -41,25 +41,31 @@ export default function Page() {
   }
 
   return (
-    <div className="Home Main_Card container-fluid mt-5">
-      <div className="Title row d-flex justify-content-between align-items-center align-self-stretch">
-        <div className="App col-md-7 d-flex align-items-center">
-          <div className="App_Logo"></div>
-          <div className="App_Name">KodOff</div>
+    <div>
+      {Object.keys(user).length !== 0 ? (
+        <div className="Home Main_Card container-fluid mt-5">
+          <div className="Title row d-flex justify-content-between align-items-center align-self-stretch">
+            <div className="App col-md-7 d-flex align-items-center">
+              <div className="App_Logo"></div>
+              <div className="App_Name">KodOff</div>
+            </div>
+            <div className="col-md-5"><Profile user={user}/></div>
+          </div>
+          <div className="Content row d-flex gx-5">
+            <div className="Game_Menu col-md-5 d-flex flex-column justify-content-center align-items-start text-break">
+              <button type="submit" className="Menu_Button">Custom Game</button>
+              <button type="submit" className="Menu_Button">Matchmaking</button>
+              <button type="submit" className="Menu_Button">Join Game</button>
+              <button type="submit" className="Menu_Button">History</button>
+              <button type="submit" className="Menu_Button">Leaderboard</button>
+              <button type="submit" className="SubMenu_Button" onClick={logOutAccount}>Log Out</button>
+            </div>
+            <div className="col-md-7 Main_Illustration"></div>
+          </div>
         </div>
-        <div className="col-md-5"><Profile user={user}/></div>
-      </div>
-      <div className="Content row d-flex gx-5">
-        <div className="Game_Menu col-md-5 d-flex flex-column justify-content-center align-items-start text-break">
-          <button type="submit" className="Menu_Button">Custom Game</button>
-          <button type="submit" className="Menu_Button">Matchmaking</button>
-          <button type="submit" className="Menu_Button">Join Game</button>
-          <button type="submit" className="Menu_Button">History</button>
-          <button type="submit" className="Menu_Button">Leaderboard</button>
-          <button type="submit" className="SubMenu_Button" onClick={logOutAccount}>Log Out</button>
-        </div>
-        <div className="col-md-7 Main_Illustration"></div>
-      </div>
+      ) : ( 
+        <div></div>
+      )}
     </div>
   )
 }

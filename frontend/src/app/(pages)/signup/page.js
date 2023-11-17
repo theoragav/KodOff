@@ -26,7 +26,7 @@ export function SignUp() {
             <div className="Main_Access d-flex flex-column align-items-center">
               <button type="submit" className="mb-2 Main_Btn" onClick={redirectToGithub}>
                 <i className="bi bi-github Main_Icon"></i>
-                Log In with Github
+                Sign Up with Github
               </button>
               <Link className="Main_Switch" href="/login">Already have an account?</Link>
             </div>
