@@ -1,40 +1,35 @@
-.Access_Card {
+.Home .Title {
+    padding: 0px 50px;
+}
+
+.Home .App {
+    gap: 5px;
+}
+
+.Home .App .App_Logo {
+    background-image: url("/assets/Logo.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100%;
+    width: 6vh;
+    height: 6vh;
+}
+
+.Home .App .App_Name {
+    color: #FFFBF5;
+    font-family: IBM Plex Mono;
+    font-size: 60px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    letter-spacing: 3.5px;
+}
+
+.Main_Card {
     border-radius: 30px;
     background: linear-gradient(180deg, rgba(34, 38, 41, 0.92) 0%, #222629 100%);
     box-shadow: 0px 3px 8px 0px rgba(217, 217, 217, 0.25);
-}
-
-.Main_LeftContainer {
-    gap: 35px;
-}
-
-.Main_Title {
-    color: #FFFBF5;
-    font-family: IBM Plex Mono;
-    font-size: 70px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
-    letter-spacing: 5px;
-}
-
-.Main_Slogan {
-    color: #4FD2CA;
-    font-family: Consolas;
-    font-size: 20px;
-    font-style: italic;
-    font-weight: 700;
-    line-height: normal;
-}
-
-.Main_Description {
-    color: #BFBFBF;
-    text-align: center;
-    font-family: Poppins;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: normal;
+    padding: 50px 0px !important;
 }
 
 .Main_Illustration {
@@ -45,28 +40,48 @@
     height: 60vh;
 }
 
-.Main_Btn {
-    padding: 15px 30px;
-    border-radius: 10px;
-    background: #FFFBF5;
-
-    color: #222629;
-    font-family: Poppins;
-    font-size: 16px;
-    font-weight: 800;
-    border: none;
+.Home .Content {
+    padding-right: 50px;
 }
 
-.Main_Icon {
-    font-size: 20px;
-    margin-right: 10px;
-    color: #222629;
+.Home .Game_Menu {
+    gap: 10px;
 }
 
-.Main_Switch {
+.Home .Game_Menu .Menu_Button {
+    display: flex;
+    padding: 25px 80px 25px 50px;
+    max-width: 100%;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 10px;
+    border-radius: 0px 30px 0px 0px;
+
+    background: #2E363D;
+    border: 0px;
     color: #FFFBF5;
-    font-family: Poppins;
-    font-size: 14px;
-    font-weight: 400;
-    text-decoration-line: underline;
+    font-size: 30px;
+    font-style: italic;
+    font-weight: 700;
+    line-height: normal;
+    letter-spacing: 0.35px;
+    text-transform: uppercase;
+}
+
+.Home .Game_Menu .SubMenu_Button {
+    display: flex;
+    padding: 15px 50px;
+    justify-content: center;
+    align-items: flex-start;
+
+    background-color: transparent;
+    border: 0px;
+    color: #BFBFBF;
+    background: none;
+    font-size: 25px;
+    font-style: italic;
+    font-weight: 700;
+    line-height: normal;
+    letter-spacing: 0.25px;
+    text-transform: uppercase;
 }

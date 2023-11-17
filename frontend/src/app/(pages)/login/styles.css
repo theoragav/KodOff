@@ -2,13 +2,27 @@
     border-radius: 30px;
     background: linear-gradient(180deg, rgba(34, 38, 41, 0.92) 0%, #222629 100%);
     box-shadow: 0px 3px 8px 0px rgba(217, 217, 217, 0.25);
+    padding: 50px !important;
 }
 
-.Main_LeftContainer {
+.Access_Card .Left_Container {
     gap: 35px;
 }
 
-.Main_Title {
+.Access_Card .App {
+    gap: 5px;
+}
+
+.Access_Card .App .App_Logo {
+    background-image: url("/assets/Logo.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100%;
+    width: 6vh;
+    height: 6vh;
+}
+
+.Access_Card .App .App_Name {
     color: #FFFBF5;
     font-family: IBM Plex Mono;
     font-size: 70px;
