@@ -111,12 +111,13 @@ webSocket.on("connection", (ws, request) => {
             const gameId = guid();
             games[gameId] = {
                 "id": gameId,
-                "clients": [],        
+                "clients": [{"clientId": clientId, "submits": 0}],        
             }
 
             const payload = {
                 "method": "create",
-                "game": games[gameId]
+                "game": games[gameId],
+                "clientId": clientId
             }
 
             const connect = clients[clientId].connection;
@@ -126,6 +127,17 @@ webSocket.on("connection", (ws, request) => {
         if (result.method === "join"){
             const clientId = result.clientId;
             const gameId = result.gameId;
+
+            // Check if the game ID is valid
+            if (!games[gameId]) {
+                // Handle invalid game ID (e.g., send an error message to the client)
+                const errorPayload = {
+                    "method": "error",
+                    "message": "Invalid game ID"
+                };
+                clients[clientId].connection.send(JSON.stringify(errorPayload));
+                return;
+            }
             const game = games[gameId];
 
             // max num of players is 2

@@ -1,0 +1,17 @@
+*{
+    font-family: Josefin Sans;
+}
+.player-heading{
+    font-size: larger;
+    font-weight: bold;
+}
+
+.game-pin-label{
+    font-size: larger;
+    font-weight: bold; 
+}
+
+.game-pin-div{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}

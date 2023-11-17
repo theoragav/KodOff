@@ -6,10 +6,12 @@ const wsUrl = 'ws://localhost:4000';
 export default function Home() {
   const ws = useRef(null);
   const [clientId, setClientId] = useState(null);
+  const [creatorId, setCreatorId] = useState(null);
   const [gameId, setGameId] = useState(null);
   const [game, setGame] = useState(null);
   const [winner, setWinner] = useState(null);
   const [timeLeft, setTimeLeft] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     // Initialize WebSocket connection
@@ -31,6 +33,8 @@ export default function Home() {
       // create
       if (response.method === "create") {
         setGameId(response.game.id);
+        setCreatorId(response.clientId);
+        setGame(response.game);
       }
 
       // join
@@ -52,6 +56,12 @@ export default function Home() {
       if (response.method === "timer") {
         setTimeLeft(response.timeLeft);
       }
+
+      // Handle error
+      if (response.method === "error") {
+        setErrorMessage(response.message);
+        return; // Early return to prevent further processing
+      }
     };
 
     newWs.onclose = () => {
@@ -69,6 +79,12 @@ export default function Home() {
       console.log("Client id set successfully " + clientId);
     }
   }, [clientId]);
+
+  useEffect(() => {
+    if (creatorId) {
+      console.log("Creator id set successfully " + creatorId);
+    }
+  }, [creatorId]);
 
   useEffect(() => {
     if (gameId) {
@@ -93,6 +109,7 @@ export default function Home() {
       console.log("Timer updated: " + timeLeft + " milliseconds remaining");
     }
   }, [timeLeft]);
+  
 
   const handleCreateGame = () => {
     const payload = {
@@ -123,15 +140,32 @@ export default function Home() {
   return (
     <div className='main-body'>
         <h1>Coding Game</h1>
+        {errorMessage && (
+        <div style={{ color: 'red' }}>
+          Error: {errorMessage}
+        </div>
+        )}
         <button onClick={handleCreateGame}>New Game</button>
         <button onClick={handleJoinGame}>Join Game</button>
         <input type='text' onChange={(e) => setGameId(e.target.value)} />
+        <div className='game-pin-div'>
+          {gameId && clientId === creatorId && (
+            <div>
+              <span className='game-pin-label'>Game Pin:</span> {gameId}
+            </div>
+          )}
+        </div>
         <div>
-        {game?.clients.map((c) => (
-          <div key={c.clientId} style={{ width: '200px'}}>
-            client: {c.clientId}
+        {game?.clients && game.clients.length > 0 && (
+          <div>
+            <div className='player-heading'>Players:</div>
+            {game.clients.map((c, index) => (
+              <div key={c.clientId}>
+                Player {index + 1}: {c.clientId}
+              </div>
+            ))}
           </div>
-        ))}
+        )}
         </div>
         {timeLeft !== null && (
           <div>
