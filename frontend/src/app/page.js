@@ -2,6 +2,7 @@
 
 import  React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { signUp, login, logOut, loggedInUser } from "../api/api.mjs";
 import { Profile } from "./_components/profile/profile.js";
 import "./styles.css";
@@ -53,7 +54,7 @@ export default function Page() {
           </div>
           <div className="Content row d-flex gx-5">
             <div className="Game_Menu col-md-5 d-flex flex-column justify-content-center align-items-start text-break">
-              <button type="submit" className="Menu_Button">Custom Game</button>
+              <Link href="/create-game"><button type="submit" className="Menu_Button">Custom Game</button></Link>
               <button type="submit" className="Menu_Button">Matchmaking</button>
               <button type="submit" className="Menu_Button">Join Game</button>
               <button type="submit" className="Menu_Button">History</button>
