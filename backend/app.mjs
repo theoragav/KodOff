@@ -27,13 +27,15 @@ app.use(
     })
 );
 
+const middleware = session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: true
+});
+
 app.use(
-    session({
-      secret: process.env.SECRET,
-      resave: false,
-      saveUninitialized: true
-    })
-  );
+    middleware
+);
   
 app.use(function (req, res, next) {
     const username = req.session.user ? req.session.user.username : "";
@@ -260,7 +262,32 @@ const clients = {};
 const games = {};
 const timers = {};
 
-const webSocket = new WebSocketServer({ server });
+// Handling the upgrade event for WebSocket connections
+server.on('upgrade', (req, socket, head) => {
+    console.log("Received upgrade request");
+
+    if (socket.upgraded) {
+        console.log("Socket already upgraded");
+        return;
+    }
+
+    middleware(req, {}, () => {
+        if (!req.session || !req.session.user) {
+            console.log("Session not found, destroying socket");
+            socket.destroy();
+            return;
+        }
+
+        console.log("Upgrading socket for WebSocket connection");
+        socket.upgraded = true;
+        webSocket.handleUpgrade(req, socket, head, (ws) => {
+            console.log("Emitting WebSocket connection event");
+            webSocket.emit('connection', ws, req);
+        });
+    });
+});
+
+const webSocket = new WebSocketServer({ noServer: true });
 
 function startTimer(gameId, durationInSeconds) {
     const endTime = Date.now() + durationInSeconds * 1000;
@@ -330,9 +357,9 @@ function evaluateWinneronTimerEnd(gameId) {
     }
 }
 
-webSocket.on("connection", (ws, request) => {
-    const clientId = guid();
-    console.log((new Date()) + ' Received a new connection from origin ' + request.origin + '.');
+webSocket.on("connection", (ws, req) => {
+    const clientId = req.session.user.username;
+    console.log((new Date()) + ' Received a new connection from origin ' + req.headers['origin'] + '.');
 
     clients[clientId] = { "connection": ws };
 

@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { loggedInUser } from "../../../api/api.mjs";
+import { Profile } from "../../_components/profile/profile.js"
 import "./styles.css";
 
 const wsUrl = 'ws://localhost:4000'; 
@@ -174,7 +175,7 @@ export default function CreateGame() {
               <div className='player-heading'>Players:</div>
               {game.clients.map((c, index) => (
                 <div key={c.clientId}>
-                  Player {index + 1}: {c.clientId}
+                  Player {index + 1}: <Profile user={user}/>
                 </div>
               ))}
             </div>
