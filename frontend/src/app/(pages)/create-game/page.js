@@ -172,12 +172,17 @@ export default function CreateGame() {
         <div className='players-section'>
           {game?.clients && game.clients.length > 0 && (
             <div>
-              <div className='player-heading'>Players:</div>
-              {game.clients.map((c, index) => (
-                <div key={c.clientId}>
-                  Player {index + 1}: <Profile user={user}/>
-                </div>
-              ))}
+              {game?.clients.map((c) => {
+                // Log each client to the console
+                console.log(c);
+
+                // Return the JSX element for rendering
+                return (
+                  <div key={c.clientId} style={{ width: '200px' }}>
+                    {c.clientId}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

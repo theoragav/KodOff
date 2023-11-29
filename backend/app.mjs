@@ -252,6 +252,105 @@ function addUser(data) {
     })
 }
 
+async function addGame(gamePin, player1Id) {
+    return new Promise(async(resolve, reject) => {
+        const body = { gamePin: gamePin, player1: player1Id, player2: "", player1Score: 0, player2Score: 0, questions: []}                
+        const game = await db.collection('games').insertOne(body); 
+        if (game instanceof Error) {
+            return reject(game);
+        }
+        return resolve(game);
+    }) 
+}
+
+async function updateGamePlayer2(gamePin, player2Id) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const updateResult = await db.collection('games').updateOne(
+                { gamePin: gamePin }, 
+                { $set: { player2: player2Id } }
+            );
+
+            // Check if the document was found and updated
+            if (updateResult.matchedCount === 0) {
+                throw new Error("Game not found with provided gamePin.");
+            }
+
+            if (updateResult.modifiedCount === 0) {
+                throw new Error("Game found, but data was not updated.");
+            }
+
+            resolve(updateResult);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+async function incrementPlayerScore(gamePin, playerId) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let updateField = {};
+
+            // Check which player's score to increment
+            const game = await db.collection('games').findOne({ gamePin: gamePin });
+            if (!game) throw new Error("Game not found with provided gamePin.");
+
+            if (game.player1 === playerId) {
+                // Increment player1's score
+                updateField = { $inc: { player1Score: 1 } };
+            } else if (game.player2 === playerId) {
+                // Increment player2's score
+                updateField = { $inc: { player2Score: 1 } };
+            } else {
+                throw new Error("Player ID does not match any player in the game.");
+            }
+
+            const updateResult = await db.collection('games').updateOne(
+                { gamePin: gamePin }, 
+                updateField
+            );
+
+            // Check if the document was found and updated
+            if (updateResult.matchedCount === 0) {
+                throw new Error("Game not found with provided gamePin.");
+            }
+
+            if (updateResult.modifiedCount === 0) {
+                throw new Error("Game found, but score was not updated.");
+            }
+
+            resolve(updateResult);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+async function setPlayerScores(gamePin, player1Submits, player2Submits) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const updateResult = await db.collection('games').updateOne(
+                { gamePin: gamePin },
+                { $set: { player1Score: player1Submits, player2Score: player2Submits } }
+            );
+
+            // Check if the document was found and updated
+            if (updateResult.matchedCount === 0) {
+                throw new Error("Game not found with provided gamePin.");
+            }
+
+            if (updateResult.modifiedCount === 0) {
+                throw new Error("Game found, but scores were not updated.");
+            }
+
+            resolve(updateResult);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
 const server = createServer(app).listen(PORT, function (err) {
     if (err) console.log(err);
     else console.log("HTTP server on http://localhost:%s", PORT);
@@ -348,6 +447,11 @@ function evaluateWinneronTimerEnd(gameId) {
         clients[client.clientId].connection.send(JSON.stringify(payload));
     });
 
+    // Get submits count for both players
+    const player1Submits = game.clients[0]?.submits || 0;
+    const player2Submits = game.clients[1]?.submits || 0;
+    setPlayerScores(gameId, player1Submits, player2Submits);
+
     // Clean up the game state
     delete games[gameId];
     // Clear the timer if necessary
@@ -365,7 +469,7 @@ webSocket.on("connection", (ws, req) => {
 
     ws.on("open", () => console.log("opened!"));
     ws.on("close", () => console.log("closed!"));
-    ws.on("message", (message) => {
+    ws.on("message", async (message) => {
         console.log("message");
         const result = JSON.parse(message);
         console.log(result);
@@ -374,6 +478,8 @@ webSocket.on("connection", (ws, req) => {
         if (result.method === "create"){
             const clientId = result.clientId;
             const gameId = guid();
+            await addGame(gameId, clientId);
+            
             games[gameId] = {
                 "id": gameId,
                 "clients": [{"clientId": clientId, "submits": 0}],        
@@ -392,7 +498,6 @@ webSocket.on("connection", (ws, req) => {
         if (result.method === "join"){
             const clientId = result.clientId;
             const gameId = result.gameId;
-
             // Check if the game ID is valid
             if (!games[gameId]) {
                 // Handle invalid game ID (e.g., send an error message to the client)
@@ -405,10 +510,10 @@ webSocket.on("connection", (ws, req) => {
             }
             const game = games[gameId];
 
-            // max num of players is 2
-            if (game.clients && game.clients.length < 2){
+            // max num of players is 2 and cannot be the same player
+            if (game.clients && game.clients.length < 2 && game.clients[0].clientId != clientId){
                 game.clients.push({"clientId": clientId, "submits": 0});
-
+                await updateGamePlayer2(gameId, clientId);
                 const payLoad = {
                     "method": "join",
                     "game": game
@@ -443,6 +548,10 @@ webSocket.on("connection", (ws, req) => {
                             "winner": clientId
                         }
     
+                        // Get submits count for both players
+                        const player1Submits = game.clients[0]?.submits || 0;
+                        const player2Submits = game.clients[1]?.submits || 0;
+                        await setPlayerScores(gameId, player1Submits, player2Submits);
                         game.clients.forEach(client => {
                             clients[client.clientId].connection.send(JSON.stringify(payLoad));
                         });
