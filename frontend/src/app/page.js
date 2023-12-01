@@ -53,12 +53,9 @@ export default function Page() {
             <div className="col-md-5"><Profile user={user}/></div>
           </div>
           <div className="Content row d-flex gx-5">
-            <div className="Game_Menu col-md-5 d-flex flex-column justify-content-center align-items-start text-break">
+            <div className="Game_Menu col-md-5 d-flex flex-column align-items-start text-break mt-5">
               <Link href="/create-game"><button type="submit" className="Menu_Button">Custom Game</button></Link>
-              <button type="submit" className="Menu_Button">Matchmaking</button>
-              <button type="submit" className="Menu_Button">Join Game</button>
-              <button type="submit" className="Menu_Button">History</button>
-              <button type="submit" className="Menu_Button">Leaderboard</button>
+              <Link href="/history"><button type="submit" className="Menu_Button">History</button></Link>
               <button type="submit" className="SubMenu_Button" onClick={logOutAccount}>Log Out</button>
             </div>
             <div className="col-md-7 Main_Illustration"></div>
