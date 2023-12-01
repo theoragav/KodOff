@@ -29,8 +29,6 @@ export function Profile(props) {
         rankTitle = "Bronze";
     } else if (user.rank <= SilverUB) {
         rankTitle = "Silver";
-    } else if (user.rank <= GoldUB) {
-        rankTitle = "Gold";
     } else {
         rankTitle = "Gold";
     }

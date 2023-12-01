@@ -17,7 +17,7 @@
     text-transform: uppercase;
 }
 
-.Profile .Bronze {
+.Bronze {
     background-image: url("/assets/Rank_Bronze.png");
     background-repeat: no-repeat;
     background-position: center;
@@ -49,4 +49,5 @@
     font-style: normal;
     font-weight: 700;
     line-height: normal;
+    color: #FFFBF5;
 }
