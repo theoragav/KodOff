@@ -3,8 +3,10 @@
 import  React, { useState, useEffect, useRef } from 'react';
 import "./styles.css";
 import { loggedInUser } from "../../../api/api.mjs";
+import { useRouter } from 'next/navigation';
 
 export function History() {
+  const router = useRouter();
   const [user, setUser] = useState({});
   useEffect(() => {
     loggedInUser().then((data) => {
@@ -12,6 +14,10 @@ export function History() {
         else router.push('/login');
     });
   }, []);
+
+  const redirectHome = () => {
+    router.push('/');
+  };
 
   const dummyGame = [
     {player1: "abc", player2: "def", player1Score: 3, player2Score: 1, status: "Victory"},
@@ -23,7 +29,12 @@ export function History() {
 
   return (
     <div className="History container-fluid mt-5">
-      <div className="Page_Title mb-3">History</div>
+      <div className="d-flex align-items-center">
+        <button type="submit" className="Icon_Button" onClick={redirectHome}>
+          <i className="bi bi-house-door-fill Icon"></i>
+        </button>
+        <div className="Page_Title">History</div>
+      </div>
       {games.map((game, index) => (
         <div key={index} className={`Game row mt-3 justify-content-center align-items-center ${
           game.status === "Victory" ? "Victory" : game.status === "Defeat" ? "Defeat" : "Tie"}`}>

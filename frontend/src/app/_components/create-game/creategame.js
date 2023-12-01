@@ -27,7 +27,7 @@ export function CreateGame(props) {
           <i className="bi bi-clipboard Icon"></i>
         </button>
       </div>
-      <button type="submit" className="Join_Btn align-self-stretch w-100" onClick={handleSubmit}>Create Game</button>
+      <button type="submit" className="Join_Btn align-self-stretch w-100" onClick={handleSubmit}>Host Your Own Game</button>
     </div>
   )
 }

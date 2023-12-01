@@ -130,6 +130,12 @@
     margin-right: 10px;
 }
 
+.InGame .Correct .Icon {
+    color: #38944C;
+    font-size: 30px;
+    margin-right: 15px !important;
+}
+
 .InGame .Submit_Btn {
     padding: 15px 30px;
 

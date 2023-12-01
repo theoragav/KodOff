@@ -12,19 +12,20 @@ import "./styles.css";
 export default function Game() {
   const router = useRouter();
   const [user, setUser] = useState({});
-  // const [opponent, setOpponent] = useState({});
-  const [opponent, setOpponent] = useState({
-    _id: '6557fefb1ed206278afed4aa',
-    username: 'abcde',
-    pfp: 'https://64.media.tumblr.com/f3807536e9926b27fae9741f7a7ab0df/0bbbff4652e354ea-dd/s1280x1920/a3e0d2027b2e86f5760c1d39db1402a1de78a5fa.png',    
-    rank: 500,
-    createdAt: 1700265723395       
-  });
+  const [opponent, setOpponent] = useState({});
+  // const [opponent, setOpponent] = useState({
+  //   _id: '6557fefb1ed206278afed4aa',
+  //   username: 'abcde',
+  //   pfp: 'https://64.media.tumblr.com/f3807536e9926b27fae9741f7a7ab0df/0bbbff4652e354ea-dd/s1280x1920/a3e0d2027b2e86f5760c1d39db1402a1de78a5fa.png',    
+  //   rank: 500,
+  //   createdAt: 1700265723395       
+  // });
   const [gamePin, setGamePin] = useState(null);
   const [timer, setTimer] = useState(30);
   const [currentNo, setCurrentNo] = useState(1);
   const [problem, setProblem] = useState("Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.");
   const CreateGameForm = useRef(null);
+  const Or = useRef(null);
   const JoinGameForm = useRef(null);
   const initialCode = "def kodoff():";
   const [code, setCode] = useState(initialCode);
@@ -40,11 +41,13 @@ export default function Game() {
 
   const joinGame = () => {
     console.log("Joining game");
+    Or.current.className = "d-none";
     CreateGameForm.current.className = "d-none";
   };
 
   const createGame = () => {
     setGamePin("Game Pin Changed");
+    Or.current.className = "d-none";
     JoinGameForm.current.className = "d-none";
   };
 
@@ -90,9 +93,10 @@ export default function Game() {
             ) : (
               <div>
                 <div className="Page_Title mb-3">New Game</div>
-                <div className="row d-flex justify-content-between">
-                    <div className="col-md-6" ref={CreateGameForm}><CreateGame gamePin={gamePin} createGame={()=>createGame()}/></div>
-                    <div className="col-md-6" ref={JoinGameForm}><JoinGame joinGame={()=>joinGame()}/></div>
+                <div className="Forms row d-flex justify-content-between align-items-center">
+                    <div className="col-md-5" ref={CreateGameForm}><CreateGame gamePin={gamePin} createGame={()=>createGame()}/></div>
+                    <div className="col-md-1 Or" ref={Or}>OR</div>
+                    <div className="col-md-5" ref={JoinGameForm}><JoinGame joinGame={()=>joinGame()}/></div>
                 </div>
                 <Versus user={user} opponent={opponent}/>
               </div>

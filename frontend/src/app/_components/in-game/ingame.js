@@ -12,24 +12,38 @@ export function InGame(props) {
   const Q1 = useRef(null);
   const Q2 = useRef(null);
   const Q3 = useRef(null);
+  const success = useRef(null);
 
   useEffect(() => {
     if (currentNo === 1) {
       Q1.current.className = "Number Current";
       Q2.current.className = "Number Inactive";
       Q3.current.className = "Number Inactive";
+      success.current.className = "d-none";
     } else if (currentNo === 2) {
       Q1.current.className = "Number Done";
       Q2.current.className = "Number Current";
       Q3.current.className = "Number Inactive";
+      success.current.className = "Correct";
+      setTimeout(() => {
+        success.current.className = "d-none";
+      }, 2000);
     } else if (currentNo === 3) {
       Q1.current.className = "Number Done";
       Q2.current.className = "Number Done";
       Q3.current.className = "Number Current";
+      success.current.className = "Correct";
+      setTimeout(() => {
+        success.current.className = "d-none";
+      }, 2000);
     } else {
       Q1.current.className = "Number Done";
       Q2.current.className = "Number Done";
       Q3.current.className = "Number Done";
+      success.current.className = "Correct";
+      setTimeout(() => {
+        success.current.className = "d-none";
+      }, 2000);
     }
   }, [currentNo]);
 
@@ -73,7 +87,8 @@ export function InGame(props) {
       {tests && (
           <div className="Tests"><i className="bi bi-x-circle-fill Icon"></i>{tests}</div>
       )}
-      <div className="d-flex align-self-stretch justify-content-end">
+      <div className="d-flex align-self-stretch justify-content-end align-items-center">
+      <div className="Correct" ref={success}><i className="bi bi-check-circle-fill Icon"></i></div>
         <button type="submit" className="Submit_Btn" onClick={handleSubmit}>Submit</button>
       </div>
     </div>
