@@ -6,7 +6,7 @@ import { JoinGame } from "../../_components/join-game/joingame.js"
 import { CreateGame } from "../../_components/create-game/creategame"
 import { Versus } from "../../_components/versus/versus.js"
 import { InGame } from "../../_components/in-game/ingame.js"
-import { Overlay } from "../../_components/result-overlay/result.js"
+import { Result } from "../../_components/result-overlay/result.js"
 import "./styles.css";
 
 export default function Game() {
@@ -29,12 +29,7 @@ export default function Game() {
   const initialCode = "def kodoff():";
   const [code, setCode] = useState(initialCode);
   const [tests, setTests] = useState(null);
-  const [gameResult, setGameResult] = useState("Victory");
-
-  const [showOverlay, setShowOverlay] = useState(false);
-  const toggleOverlay = () => {
-    setShowOverlay(!showOverlay);
-  };
+  const [winner, setWinner] = useState(null);
 
   useEffect(() => {
     loggedInUser().then((data) => {
@@ -57,16 +52,22 @@ export default function Game() {
     console.log(code);
     // replace logic with if the code submitted is correct
     if (code === "1") {
-        // go to next problem
-        setCurrentNo(currentNo + 1);
-        // reset code block
-        setCode(initialCode);
-        // set next problem
-        setProblem("Dynamic programming hehehehe");
-        // reset tests result
-        setTests(null);
+      // go to next problem
+      setCurrentNo(currentNo + 1);
+      // reset code block
+      setCode(initialCode);
+      // set next problem
+      setProblem("Dynamic programming hehehehe");
+      // reset tests result
+      setTests(null);
+    } else if (code === "W") {
+      setWinner(user);
+    } else if (code === "T") {
+      setWinner("tie");
+    } else if (code === "D") {
+      setWinner(opponent);
     } else {
-        setTests("Failed blabla cases");
+      setTests("Failed blabla cases");
     }
   };
 
@@ -75,8 +76,17 @@ export default function Game() {
       {Object.keys(user).length !== 0 ? (
         <div className="d-flex flex-column mt-5 mb-4 justify-content-center">
             {Object.keys(opponent).length !== 0 ? (
+              <div>
               <InGame user={user} opponent={opponent} timer={timer} currentNo={currentNo} problem={problem} 
               code={code} setCode={setCode} submitProblem={(code)=>submitProblem(code)} tests={tests}/>
+              {winner && (
+                  <div>
+                      {winner === user ? <Result gameResult={"Victory!"}/> : 
+                      winner === "tie" ? <Result gameResult={"Tie"}/> : <Result gameResult={"Defeat"}/>}
+                  </div>
+              )}
+              </div>
+              
             ) : (
               <div>
                 <div className="Page_Title mb-3">New Game</div>
@@ -85,9 +95,6 @@ export default function Game() {
                     <div className="col-md-6" ref={JoinGameForm}><JoinGame joinGame={()=>joinGame()}/></div>
                 </div>
                 <Versus user={user} opponent={opponent}/>
-                {/* <button onClick={toggleOverlay}>Show Overlay</button>
-                {showOverlay && <Overlay onClose={toggleOverlay} />} */}
-                <Overlay gameResult={gameResult}/>
               </div>
             )}
         </div>

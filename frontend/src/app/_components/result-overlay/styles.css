@@ -43,3 +43,20 @@
     background-position: center;
     background-size: 100%;
   }
+
+  .Tie_Text {
+    color: #E07F49;
+    text-shadow: 3px 5px 0px rgba(224, 127, 73, 0.40);
+    font-family: Josefin Sans;
+    font-size: 125px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    letter-spacing: -10px;
+    text-transform: uppercase;
+
+    background-image: url("/assets/tie-light.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100%;
+  }
