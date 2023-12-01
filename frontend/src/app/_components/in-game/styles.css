@@ -97,10 +97,11 @@
 
 .InGame .Problem {
     border-radius: 10px;
-    background: #5478aa;
+    background: #4B95CD;
     box-shadow: 0px 3px 8px 0px rgba(217, 217, 217, 0.25);
     padding: 15px 20px !important;
 
+    font-family: Josefin Sans;
     color: #FFFBF5;
     font-size: 16px;
     font-weight: 500;
@@ -109,6 +110,24 @@
 .cm-editor { 
     border-radius: 10px;
     box-shadow: 0px 3px 8px 0px rgba(217, 217, 217, 0.25); 
+}
+
+.InGame .Tests {
+    border-radius: 10px;
+    border: 2px solid #e04949;
+    background: #1e1e1e;
+    box-shadow: 0px 3px 8px 0px rgba(217, 217, 217, 0.25);
+    padding: 15px 20px !important;
+
+    font-family: Josefin Sans;
+    color: #FFFBF5;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.InGame .Tests .Icon {
+    color: #e04949;
+    margin-right: 10px;
 }
 
 .InGame .Submit_Btn {

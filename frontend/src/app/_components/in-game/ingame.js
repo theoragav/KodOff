@@ -7,8 +7,7 @@ import { python } from "@codemirror/lang-python";
 import "./styles.css";
 
 export function InGame(props) {
-  const { user, opponent, timer, currentNo, problem, testsRan, submitProblem } = props;
-  const [code, setCode] = useState(`def kodoff():`);
+  const { user, opponent, timer, currentNo, problem, code, setCode, submitProblem, tests } = props;
 
   const Q1 = useRef(null);
   const Q2 = useRef(null);
@@ -65,12 +64,15 @@ export function InGame(props) {
           value={code}
           theme={vscodeDark}
           minHeight='50vh'
+          maxHeight='50vh'
           extensions={[python()]}
           onChange={(code) => setCode(code)}
           className="CodeEditor"
         />
       </div>
-      <div className="Problem">{testsRan}</div>
+      {tests && (
+          <div className="Tests"><i className="bi bi-x-circle-fill Icon"></i>{tests}</div>
+      )}
       <div className="d-flex align-self-stretch justify-content-end">
         <button type="submit" className="Submit_Btn" onClick={handleSubmit}>Submit</button>
       </div>

@@ -26,7 +26,9 @@ export default function Game() {
   const [problem, setProblem] = useState("Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.");
   const CreateGameForm = useRef(null);
   const JoinGameForm = useRef(null);
-  const [testsRan, setTestsRan] = useState(null);
+  const initialCode = "def kodoff():";
+  const [code, setCode] = useState(initialCode);
+  const [tests, setTests] = useState(null);
   const [gameResult, setGameResult] = useState("Victory");
 
   const [showOverlay, setShowOverlay] = useState(false);
@@ -53,9 +55,18 @@ export default function Game() {
 
   const submitProblem = (code) => {
     console.log(code);
-    if (code === "def kodoff():") {
+    // replace logic with if the code submitted is correct
+    if (code === "1") {
+        // go to next problem
         setCurrentNo(currentNo + 1);
+        // reset code block
+        setCode(initialCode);
+        // set next problem
         setProblem("Dynamic programming hehehehe");
+        // reset tests result
+        setTests(null);
+    } else {
+        setTests("Failed blabla cases");
     }
   };
 
@@ -65,7 +76,7 @@ export default function Game() {
         <div className="d-flex flex-column mt-5 mb-4 justify-content-center">
             {Object.keys(opponent).length !== 0 ? (
               <InGame user={user} opponent={opponent} timer={timer} currentNo={currentNo} problem={problem} 
-              submitProblem={(code)=>submitProblem(code)}/>
+              code={code} setCode={setCode} submitProblem={(code)=>submitProblem(code)} tests={tests}/>
             ) : (
               <div>
                 <div className="Page_Title mb-3">New Game</div>
@@ -76,7 +87,7 @@ export default function Game() {
                 <Versus user={user} opponent={opponent}/>
                 {/* <button onClick={toggleOverlay}>Show Overlay</button>
                 {showOverlay && <Overlay onClose={toggleOverlay} />} */}
-                {/* <Overlay gameResult={gameResult}/> */}
+                <Overlay gameResult={gameResult}/>
               </div>
             )}
         </div>
