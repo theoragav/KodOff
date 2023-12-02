@@ -54,7 +54,7 @@ export default function Page() {
           </div>
           <div className="Content row d-flex gx-5">
             <div className="Game_Menu col-md-5 d-flex flex-column align-items-start text-break mt-5">
-              <Link href="/create-game"><button type="submit" className="Menu_Button">Custom Game</button></Link>
+              <Link href="/one-page-game"><button type="submit" className="Menu_Button">Let's KodOff</button></Link>
               <Link href="/history"><button type="submit" className="Menu_Button">History</button></Link>
               <button type="submit" className="SubMenu_Button" onClick={logOutAccount}>Log Out</button>
             </div>

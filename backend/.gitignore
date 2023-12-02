@@ -8,3 +8,5 @@ uploads
 db
 *-lock.json
 
+# python runner
+gameplay/tempPy/

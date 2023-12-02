@@ -59,6 +59,10 @@ export default function CreateGame() {
         setWinner(response.winner);
       }
 
+      if (response.method === "nextQuestion"){
+        setGame(response.game);
+      }
+
       if (response.method === "end"){
         setGame(response.game);
         setWinner(response.winner);
@@ -173,13 +177,10 @@ export default function CreateGame() {
           {game?.clients && game.clients.length > 0 && (
             <div>
               {game?.clients.map((c) => {
-                // Log each client to the console
-                console.log(c);
-
                 // Return the JSX element for rendering
                 return (
-                  <div key={c.clientId} style={{ width: '200px' }}>
-                    {c.clientId}
+                  <div key={c.clientId}>
+                    <Profile user={c.user}></Profile>
                   </div>
                 );
               })}
@@ -188,8 +189,16 @@ export default function CreateGame() {
         </div>
         {timeLeft !== null && (
           <div className='game-timer'>
-            Time Left: {Math.floor(timeLeft / 1000)} seconds
+            Time Left: {Math.floor(timeLeft / 60000)}:{(timeLeft % 60000 / 1000).toFixed(0).padStart(2, '0')}
           </div>
+        )}
+        {game && game.clients.some(client => client.clientId === clientId) && 
+        game.clients.find(client => client.clientId === clientId)?.problem &&
+        game.clients.find(client => client.clientId === clientId)?.problem?.desc && (
+            <div className='current-problem'>
+                <h3>Current Problem:</h3>
+                <p>{game.clients.find(client => client.clientId === clientId).problem.desc}</p>
+            </div>
         )}
         <button className='game-pin-btn' onClick={handleSubmit}>Submit</button>
         {game && winner && (

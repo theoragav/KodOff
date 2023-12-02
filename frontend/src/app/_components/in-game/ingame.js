@@ -41,9 +41,6 @@ export function InGame(props) {
       Q2.current.className = "Number Done";
       Q3.current.className = "Number Done";
       success.current.className = "Correct";
-      setTimeout(() => {
-        success.current.className = "d-none";
-      }, 2000);
     }
   }, [currentNo]);
 
@@ -65,7 +62,11 @@ export function InGame(props) {
             <div className="Number" ref={Q3}>3</div>
           </div>
           <div className="Clock"></div>
-          <div className="Timer">{timer}</div>
+          {timer !== null && (
+          <div className='Timer'>
+            {Math.floor(timer / 60000)}:{(timer % 60000 / 1000).toFixed(0).padStart(2, '0')}
+          </div>
+        )}
         </div>
         <div className="Profile col-md-3 d-flex align-items-center flex-wrap">
           <img className="Pfp Opponent" src={opponent.pfp}/>

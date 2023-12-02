@@ -7,6 +7,7 @@ import session from "express-session";
 import { serialize } from "cookie";
 import db from './db/connection.mjs'; 
 import { WebSocketServer } from "ws";
+import { updateRanks } from "./gameplay/rankSystem.mjs";
 
 dotenv.config();
 const PORT = 4000;
@@ -253,102 +254,107 @@ function addUser(data) {
 }
 
 async function addGame(gamePin, player1Id) {
-    return new Promise(async(resolve, reject) => {
-        const body = { gamePin: gamePin, player1: player1Id, player2: "", player1Score: 0, player2Score: 0, questions: []}                
-        const game = await db.collection('games').insertOne(body); 
-        if (game instanceof Error) {
-            return reject(game);
-        }
-        return resolve(game);
-    }) 
+    try {
+
+        const body = {
+            gamePin: gamePin,
+            player1: player1Id,
+            player2: "",
+            player1Score: 0,
+            player2Score: 0,
+            questions: []
+        };
+
+        const game = await db.collection('games').insertOne(body);
+        
+        // Assuming `insertOne` returns the document on success
+        return game;
+    } catch (error) {
+        console.error("Error in addGame:", error);
+        throw error; // Propagate the error to be handled by the caller
+    }
+}
+
+async function addProblem() {
+    try {
+        const body = {
+            desc: "Give a function named kodoff that takes in an array of integers and returns the average",
+            test_cases: ["[1,2,3]", "[3,4,5]", "[4,5,9]"],
+            test_results: ["2", "4", "6"]
+        };
+
+        const problem = await db.collection('problems').insertOne(body);
+        console.log("inserted problem yayay");
+        // Assuming `insertOne` returns the document on success
+        return problem;
+    } catch (error) {
+        console.error("Error in addProblem:", error);
+        throw error; // Propagate the error to be handled by the caller
+    }
 }
 
 async function updateGamePlayer2(gamePin, player2Id) {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const updateResult = await db.collection('games').updateOne(
-                { gamePin: gamePin }, 
-                { $set: { player2: player2Id } }
-            );
+    try {
+        const updateResult = await db.collection('games').updateOne(
+            { gamePin: gamePin },
+            { $set: { player2: player2Id } }
+        );
 
-            // Check if the document was found and updated
-            if (updateResult.matchedCount === 0) {
-                throw new Error("Game not found with provided gamePin.");
-            }
-
-            if (updateResult.modifiedCount === 0) {
-                throw new Error("Game found, but data was not updated.");
-            }
-
-            resolve(updateResult);
-        } catch (error) {
-            reject(error);
+        if (updateResult.matchedCount === 0) {
+            throw new Error("Game not found with provided gamePin.");
         }
-    });
-}
 
-async function incrementPlayerScore(gamePin, playerId) {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let updateField = {};
-
-            // Check which player's score to increment
-            const game = await db.collection('games').findOne({ gamePin: gamePin });
-            if (!game) throw new Error("Game not found with provided gamePin.");
-
-            if (game.player1 === playerId) {
-                // Increment player1's score
-                updateField = { $inc: { player1Score: 1 } };
-            } else if (game.player2 === playerId) {
-                // Increment player2's score
-                updateField = { $inc: { player2Score: 1 } };
-            } else {
-                throw new Error("Player ID does not match any player in the game.");
-            }
-
-            const updateResult = await db.collection('games').updateOne(
-                { gamePin: gamePin }, 
-                updateField
-            );
-
-            // Check if the document was found and updated
-            if (updateResult.matchedCount === 0) {
-                throw new Error("Game not found with provided gamePin.");
-            }
-
-            if (updateResult.modifiedCount === 0) {
-                throw new Error("Game found, but score was not updated.");
-            }
-
-            resolve(updateResult);
-        } catch (error) {
-            reject(error);
+        if (updateResult.modifiedCount === 0) {
+            throw new Error("Game found, but data was not updated.");
         }
-    });
+
+        return updateResult;
+    } catch (error) {
+        throw error; // Rethrow the error to be handled by the caller
+    }
 }
 
 async function setPlayerScores(gamePin, player1Submits, player2Submits) {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const updateResult = await db.collection('games').updateOne(
-                { gamePin: gamePin },
-                { $set: { player1Score: player1Submits, player2Score: player2Submits } }
-            );
+    try {
+        console.log(gamePin);
+        console.log(player1Submits);
+        console.log(player2Submits);
+        
+        const updateResult = await db.collection('games').updateOne(
+            { gamePin: gamePin },
+            { $set: { player1Score: player1Submits, player2Score: player2Submits } }
+        );
 
-            // Check if the document was found and updated
-            if (updateResult.matchedCount === 0) {
-                throw new Error("Game not found with provided gamePin.");
-            }
-
-            if (updateResult.modifiedCount === 0) {
-                throw new Error("Game found, but scores were not updated.");
-            }
-
-            resolve(updateResult);
-        } catch (error) {
-            reject(error);
+        // Check if the document was found and updated
+        if (updateResult.matchedCount === 0) {
+            throw new Error("Game not found with provided gamePin.");
         }
-    });
+
+        return updateResult;
+    } catch (error) {
+        // Rethrow the error to be handled by the caller
+        throw error;
+    }
+}
+
+async function getThreeRandomQuestions() {
+    try {
+        // Aggregate pipeline to fetch 3 random documents with only id and desc fields
+        const questions = await db.collection('problems').aggregate([
+            { $sample: { size: 3 } },
+            { $project: { _id: 1, desc: 1 } }
+        ]).toArray();
+
+        console.log(questions);
+        // Check if three questions were retrieved
+        if (questions.length < 3) {
+            throw new Error("Not enough questions in the database.");
+        }
+
+        return questions;
+    } catch (error) {
+        throw error; // Rethrow the error to be handled by the caller
+    }
 }
 
 const server = createServer(app).listen(PORT, function (err) {
@@ -360,6 +366,7 @@ const server = createServer(app).listen(PORT, function (err) {
 const clients = {};
 const games = {};
 const timers = {};
+const gamesBackend = {};
 
 // Handling the upgrade event for WebSocket connections
 server.on('upgrade', (req, socket, head) => {
@@ -454,6 +461,8 @@ function evaluateWinneronTimerEnd(gameId) {
 
     // Clean up the game state
     delete games[gameId];
+    console.log("after evaluating winner");
+    console.log(games);
     // Clear the timer if necessary
     if (timers[gameId] && timers[gameId].updateInterval) {
         clearInterval(timers[gameId].updateInterval);
@@ -477,12 +486,32 @@ webSocket.on("connection", (ws, req) => {
         // user wants to create game
         if (result.method === "create"){
             const clientId = result.clientId;
+            // Check if the user is already in an ongoing game
+            let isAlreadyInGame = false;
+            for (const game of Object.values(games)) {
+                if (game.clients.some(client => client.clientId === clientId)) {
+                    isAlreadyInGame = true;
+                    break;
+                }
+            }
+
+            // if (isAlreadyInGame) {
+            //     // Handle the situation when the user is already in a game
+            //     const errorPayload = {
+            //         "method": "error",
+            //         "message": "Cannot create a new game while already in an ongoing game."
+            //     };
+            //     clients[clientId].connection.send(JSON.stringify(errorPayload));
+            //     return;
+            // }
+
             const gameId = guid();
             await addGame(gameId, clientId);
+            const user = await getUser(clientId);
             
             games[gameId] = {
                 "id": gameId,
-                "clients": [{"clientId": clientId, "submits": 0}],        
+                "clients": [{"clientId": clientId, "submits": 0, "user": user, "problem": ""}],      
             }
 
             const payload = {
@@ -493,11 +522,15 @@ webSocket.on("connection", (ws, req) => {
 
             const connect = clients[clientId].connection;
             connect.send(JSON.stringify(payload));
+            console.log(games);
+            console.log("payload.id" + payload.id);
+            console.log(payload);
         }
 
         if (result.method === "join"){
             const clientId = result.clientId;
             const gameId = result.gameId;
+
             // Check if the game ID is valid
             if (!games[gameId]) {
                 // Handle invalid game ID (e.g., send an error message to the client)
@@ -510,24 +543,66 @@ webSocket.on("connection", (ws, req) => {
             }
             const game = games[gameId];
 
-            // max num of players is 2 and cannot be the same player
-            if (game.clients && game.clients.length < 2 && game.clients[0].clientId != clientId){
-                game.clients.push({"clientId": clientId, "submits": 0});
-                await updateGamePlayer2(gameId, clientId);
-                const payLoad = {
-                    "method": "join",
-                    "game": game
-                }
-                // notify player that other player has joined
-                game.clients.forEach(client => {
-                    clients[client.clientId].connection.send(JSON.stringify(payLoad));
-                });
+            // Check if game already has max players
+            if (game.clients && game.clients.length >= 2) {
+                const errorPayload = {
+                    "method": "error",
+                    "message": "Cannot join the game as it is already full."
+                };
+                clients[clientId].connection.send(JSON.stringify(errorPayload));
+                return;
+            }
 
-                // If this is the second player joining, start the timer after notification
-                if (game.clients.length === 2) {
-                    // Start the game timer here
-                    startTimer(gameId, 10); // Assuming a 10-second game for example
+            // Check if the same player is trying to join
+            if (game.clients.some(client => client.clientId === clientId)) {
+                const errorPayload = {
+                    "method": "error",
+                    "message": "Cannot join the game as you are already in it."
+                };
+                clients[clientId].connection.send(JSON.stringify(errorPayload));
+                return;
+            }
+
+            // Check if the user is already in an ongoing game
+            let isAlreadyInGame = false;
+            for (const otherGame of Object.values(games)) {
+                if (otherGame.clients.some(client => client.clientId === clientId)) {
+                    isAlreadyInGame = true;
+                    break;
                 }
+            }
+
+            // Handle case where user is already in another game
+            if (isAlreadyInGame) {
+                const errorPayload = {
+                    "method": "error",
+                    "message": "Cannot join a new game while already in an ongoing game."
+                };
+                clients[clientId].connection.send(JSON.stringify(errorPayload));
+                return;
+            }
+
+            // join game
+            const user = await getUser(clientId);
+            const problems = await getThreeRandomQuestions();
+            gamesBackend[gameId] = problems;
+            // assign first question for both
+            game.clients[0].problem = gamesBackend[gameId][0];
+            game.clients.push({"clientId": clientId, "submits": 0, "user": user, "problem": gamesBackend[gameId][0]});
+            await updateGamePlayer2(gameId, clientId);
+            const payLoad = {
+                "method": "join",
+                "game": game
+            }
+            // notify player that other player has joined
+            game.clients.forEach(client => {
+                clients[client.clientId].connection.send(JSON.stringify(payLoad));
+            });
+
+            // If this is the second player joining, start the timer after notification
+            if (game.clients.length === 2) {
+                // Start the game timer here
+                startTimer(gameId, 65); // Assuming a 10-second game for example
             }
         }
 
@@ -540,6 +615,12 @@ webSocket.on("connection", (ws, req) => {
 
                 if (clientIndex !== -1){
                     game.clients[clientIndex].submits++;
+                    game.clients[clientIndex].problem = gamesBackend[gameId][game.clients[clientIndex].submits];
+                    const payLoad = {
+                        "method": "nextQuestion",
+                        "game": game,
+                    }
+                    clients[clientId].connection.send(JSON.stringify(payLoad));
 
                     if (game.clients[clientIndex].submits >= 3){
                         const payLoad = {
@@ -552,6 +633,7 @@ webSocket.on("connection", (ws, req) => {
                         const player1Submits = game.clients[0]?.submits || 0;
                         const player2Submits = game.clients[1]?.submits || 0;
                         await setPlayerScores(gameId, player1Submits, player2Submits);
+                        const player1 = getUser()
                         game.clients.forEach(client => {
                             clients[client.clientId].connection.send(JSON.stringify(payLoad));
                         });
@@ -562,7 +644,6 @@ webSocket.on("connection", (ws, req) => {
                             clearInterval(gameTimer);
                             delete timers[gameId];
                         }
-                        
                         delete games[gameId];
                     }
                 }
@@ -585,4 +666,4 @@ function S4() {
 }
  
 // then to call it, plus stitch in '4' in the third group
-const guid = () => (S4() + S4() + "-" + S4() + "-4" + S4().substr(0,3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
+const guid = () => (S4() + S4() + "-" + S4() + "-4" + S4().substring(0,3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
