@@ -8,6 +8,7 @@ import { serialize } from "cookie";
 import db from './db/connection.mjs'; 
 import { WebSocketServer } from "ws";
 import { updateRanks } from "./gameplay/rankSystem.mjs";
+import { execPythonScript } from "./gameplay/dockerManager.mjs"
 
 dotenv.config();
 const PORT = 4000;
@@ -23,7 +24,7 @@ app.use(express.json());
 
 app.use(
     cors({
-      origin: "http://localhost:3000",
+      origin: process.env.FRONTEND,
       credentials: true,
     })
 );
@@ -54,6 +55,7 @@ const isAuthenticated = function (req, res, next) {
     next();
 };
 
+/* endpoints */
 app.get('/', (req, res) => {
     if (!req.session.user) {
         return null;
@@ -171,10 +173,11 @@ app.get("/logout/", function (req, res, next) {
     res.end();
 });
 
-app.get("/user/", (req, res) => {
+app.get("/user/", async function(req, res) {
     if (!req.session.user) {
         return res.json(null);
     }
+    req.session.user.rank = await getLatestRank(req.session.user.username);
     return res.json(req.session.user);
 });
 
@@ -324,7 +327,6 @@ async function addGame(gamePin, player1Id) {
             player2: "",
             player1Score: 0,
             player2Score: 0,
-            questions: []
         };
 
         const game = await db.collection('games').insertOne(body);
@@ -333,24 +335,6 @@ async function addGame(gamePin, player1Id) {
         return game;
     } catch (error) {
         console.error("Error in addGame:", error);
-        throw error; // Propagate the error to be handled by the caller
-    }
-}
-
-async function addProblem() {
-    try {
-        const body = {
-            desc: "Give a function named kodoff that takes in an array of integers and returns the average",
-            test_cases: ["[1,2,3]", "[3,4,5]", "[4,5,9]"],
-            test_results: ["2", "4", "6"]
-        };
-
-        const problem = await db.collection('problems').insertOne(body);
-        console.log("inserted problem yayay");
-        // Assuming `insertOne` returns the document on success
-        return problem;
-    } catch (error) {
-        console.error("Error in addProblem:", error);
         throw error; // Propagate the error to be handled by the caller
     }
 }
@@ -369,7 +353,6 @@ async function updateGamePlayer2(gamePin, player2Id) {
         if (updateResult.modifiedCount === 0) {
             throw new Error("Game found, but data was not updated.");
         }
-
         return updateResult;
     } catch (error) {
         throw error; // Rethrow the error to be handled by the caller
@@ -378,9 +361,6 @@ async function updateGamePlayer2(gamePin, player2Id) {
 
 async function setPlayerScores(gamePin, player1Submits, player2Submits) {
     try {
-        console.log(gamePin);
-        console.log(player1Submits);
-        console.log(player2Submits);
         
         const updateResult = await db.collection('games').updateOne(
             { gamePin: gamePin },
@@ -399,6 +379,85 @@ async function setPlayerScores(gamePin, player1Submits, player2Submits) {
     }
 }
 
+async function updatePlayerRanks(player1Id, player2Id, player1Rank, player2Rank) {
+    try {
+        // Update rank for player1
+        const updateResult1 = await db.collection('users').updateOne(
+            { username: player1Id },
+            { $set: { rank: player1Rank } }
+        );
+
+        // Check if the document for player1 was found and updated
+        if (updateResult1.matchedCount === 0) {
+            throw new Error("User not found with provided player1Id.");
+        }
+
+        // Update rank for player2
+        const updateResult2 = await db.collection('users').updateOne(
+            { username: player2Id },
+            { $set: { rank: player2Rank } }
+        );
+
+        // Check if the document for player2 was found and updated
+        if (updateResult2.matchedCount === 0) {
+            throw new Error("User not found with provided player2Id.");
+        }
+
+        return { player1Update: updateResult1, player2Update: updateResult2 };
+    } catch (error) {
+        // Rethrow the error to be handled by the caller
+        throw error;
+    }
+}
+
+async function getPlayerRanks(player1Id, player2Id) {
+    try {
+        // Query the database to get the rank of player 1
+        const player1 = await db.collection('users').findOne({ username: player1Id }, { projection: { rank: 1 } });
+        if (!player1) throw new Error("Player 1 not found.");
+
+        // Query the database to get the rank of player 2
+        const player2 = await db.collection('users').findOne({ username: player2Id }, { projection: { rank: 1 } });
+        if (!player2) throw new Error("Player 2 not found.");
+
+        return { player1Rank: player1.rank, player2Rank: player2.rank };
+    } catch (error) {
+        console.error("Error fetching player ranks:", error);
+        throw error; // Rethrow the error to be handled by the caller
+    }
+}
+
+async function getLatestRank(username) {
+    try {
+        // Query the database to get the user document for the given username
+        const user = await db.collection('users').findOne({ username: username }, { projection: { rank: 1 } });
+
+        // Check if the user was found
+        if (!user) {
+            throw new Error("User not found.");
+        }
+
+        // Return the rank of the user
+        return user.rank;
+    } catch (error) {
+        console.error("Error fetching user rank:", error);
+        throw error; // Rethrow the error to be handled by the caller
+    }
+}
+/* Debugging */
+async function getGame(gamePin){
+    try {
+        const game = await db.collection('games').findOne({ gamePin: gamePin });
+        console.log(game); // Log the game object
+
+        // If no game is found, return null, otherwise return the game object
+        return game ? game : null;
+    } catch (error) {
+        // Log and rethrow the error
+        console.error("Error fetching game:", error);
+        throw error;
+    }
+}
 async function getThreeRandomQuestions() {
     try {
         // Aggregate pipeline to fetch 3 random documents with only id and desc fields
@@ -457,6 +516,8 @@ server.on('upgrade', (req, socket, head) => {
 
 const webSocket = new WebSocketServer({ noServer: true });
 
+
+/* Helper Functions */
 function startTimer(gameId, durationInSeconds) {
     const endTime = Date.now() + durationInSeconds * 1000;
 
@@ -483,7 +544,6 @@ function startTimer(gameId, durationInSeconds) {
 
 }
 
-// helpers 
 function sendTimeUpdateToClients(gameId, remainingTime) {
     const payload = {
         "method": "timer",
@@ -494,7 +554,7 @@ function sendTimeUpdateToClients(gameId, remainingTime) {
     });
 }
 
-function evaluateWinneronTimerEnd(gameId) {
+async function evaluateWinneronTimerEnd(gameId) {
     const game = games[gameId];
     let winnerId = null;
 
@@ -502,10 +562,31 @@ function evaluateWinneronTimerEnd(gameId) {
         winnerId = game.clients[0].clientId;
     } else if (game.clients[1].submits > game.clients[0].submits) {
         winnerId = game.clients[1].clientId;
-    } else if (game.clients[1].submits === game.clients[0].submits){
-        winnerId = "tie"
+    } else if (game.clients[1].submits === game.clients[0].submits) {
+        winnerId = "tie";
     }
 
+    // Get submits count for both players
+    const player1Submits = game.clients[0]?.submits || 0;
+    const player2Submits = game.clients[1]?.submits || 0;
+
+    try {
+        await setPlayerScores(gameId, player1Submits, player2Submits);
+    } catch (error) {
+        console.error("Error setting player scores:", error);
+        // Handle error or rethrow if necessary
+    }
+    
+    try {
+        const currRanks = await getPlayerRanks(game.clients[0].clientId, game.clients[1].clientId);
+        const newRanks = updateRanks(currRanks.player1Rank, currRanks.player2Rank, player1Submits, player2Submits);
+        await updatePlayerRanks(game.clients[0].clientId, game.clients[1].clientId, newRanks.newPlayer1Rank, newRanks.newPlayer2Rank);
+    } catch (error) {
+        console.error("Error updating player ranks:", error);
+        // Handle error or rethrow if necessary
+    }
+
+    
     const payload = {
         "method": "end",
         "game": game,
@@ -516,15 +597,9 @@ function evaluateWinneronTimerEnd(gameId) {
         clients[client.clientId].connection.send(JSON.stringify(payload));
     });
 
-    // Get submits count for both players
-    const player1Submits = game.clients[0]?.submits || 0;
-    const player2Submits = game.clients[1]?.submits || 0;
-    setPlayerScores(gameId, player1Submits, player2Submits);
-
     // Clean up the game state
     delete games[gameId];
-    console.log("after evaluating winner");
-    console.log(games);
+
     // Clear the timer if necessary
     if (timers[gameId] && timers[gameId].updateInterval) {
         clearInterval(timers[gameId].updateInterval);
@@ -532,6 +607,54 @@ function evaluateWinneronTimerEnd(gameId) {
     }
 }
 
+
+function findGameForClient(clientId) {
+    for (const gameId in games) {
+      const game = games[gameId];
+      console.log("on game: "+ game);
+      const client = game.clients.find((client) => client.clientId === clientId);
+      if (client) {
+        // The client is in this game
+        return game;
+      }
+    }
+    // The client is not in any game
+    return null;
+}
+
+/* For python script execution */
+async function getProblemTestsForUser(clientId) {
+    try {
+        console.log("finding game for "+ clientId);
+        const game = findGameForClient(clientId);
+        // Check if the client is in a game
+        if (!game) {
+            throw new Error("Client is not in any game.");
+        }
+
+        // Extract the client's problem from the game
+        const client = game.clients.find(client => client.clientId === clientId);
+
+        // Check if the client's problem exists and has an _id
+        if (!client || !client.problem || !client.problem._id) {
+            throw new Error("Problem not found for the client in the game.");
+        }
+
+        // Fetch the problem's test cases and test results from the database
+        const problemTests = await db.collection('problems').findOne({ _id: client.problem._id }, { projection: { _id: 0, test_cases: 1, test_results: 1 } });
+
+        // Check if the problem tests were retrieved
+        if (!problemTests) {
+            throw new Error("Problem tests not found in the database.");
+        }
+
+        console.log("problem tests: " + problemTests);
+        return problemTests;
+    } catch (error) {
+        throw error; // Rethrow the error to be handled by the caller
+    }
+}
+  
 webSocket.on("connection", (ws, req) => {
     const clientId = req.session.user.username;
     console.log((new Date()) + ' Received a new connection from origin ' + req.headers['origin'] + '.');
@@ -548,14 +671,14 @@ webSocket.on("connection", (ws, req) => {
         // user wants to create game
         if (result.method === "create"){
             const clientId = result.clientId;
-            // Check if the user is already in an ongoing game
-            let isAlreadyInGame = false;
-            for (const game of Object.values(games)) {
-                if (game.clients.some(client => client.clientId === clientId)) {
-                    isAlreadyInGame = true;
-                    break;
-                }
-            }
+            // // Check if the user is already in an ongoing game
+            // let isAlreadyInGame = false;
+            // for (const game of Object.values(games)) {
+            //     if (game.clients.some(client => client.clientId === clientId)) {
+            //         isAlreadyInGame = true;
+            //         break;
+            //     }
+            // }
 
             // if (isAlreadyInGame) {
             //     // Handle the situation when the user is already in a game
@@ -584,9 +707,6 @@ webSocket.on("connection", (ws, req) => {
 
             const connect = clients[clientId].connection;
             connect.send(JSON.stringify(payload));
-            console.log(games);
-            console.log("payload.id" + payload.id);
-            console.log(payload);
         }
 
         if (result.method === "join"){
@@ -646,12 +766,15 @@ webSocket.on("connection", (ws, req) => {
 
             // join game
             const user = await getUser(clientId);
+            console.log("second user found" + user + "for client id: " + clientId);
+
+            await updateGamePlayer2(gameId, clientId);
             const problems = await getThreeRandomQuestions();
             gamesBackend[gameId] = problems;
+
             // assign first question for both
             game.clients[0].problem = gamesBackend[gameId][0];
             game.clients.push({"clientId": clientId, "submits": 0, "user": user, "problem": gamesBackend[gameId][0]});
-            await updateGamePlayer2(gameId, clientId);
             const payLoad = {
                 "method": "join",
                 "game": game
@@ -664,7 +787,7 @@ webSocket.on("connection", (ws, req) => {
             // If this is the second player joining, start the timer after notification
             if (game.clients.length === 2) {
                 // Start the game timer here
-                startTimer(gameId, 65); // Assuming a 10-second game for example
+                startTimer(gameId, 150); // Assuming a 10-second game for example
             }
         }
 
@@ -676,14 +799,27 @@ webSocket.on("connection", (ws, req) => {
                 const clientIndex = game.clients.findIndex(c => c.clientId === clientId);
 
                 if (clientIndex !== -1){
-                    game.clients[clientIndex].submits++;
-                    game.clients[clientIndex].problem = gamesBackend[gameId][game.clients[clientIndex].submits];
-                    const payLoad = {
-                        "method": "nextQuestion",
-                        "game": game,
-                    }
-                    clients[clientId].connection.send(JSON.stringify(payLoad));
+                    const tests = await getProblemTestsForUser(game.clients[clientIndex].clientId);
+                    const execResult = await execPythonScript(result.code, tests);
+                    // if code failed
+                    if (!execResult.status){
+                        const payLoad = {
+                            "method": "wrongAnswer",
+                            "message": execResult.output,
+                        }
+                        clients[clientId].connection.send(JSON.stringify(payLoad));
 
+                    }
+                    // code passed
+                    else{
+                        game.clients[clientIndex].submits++;
+                        game.clients[clientIndex].problem = gamesBackend[gameId][game.clients[clientIndex].submits];
+                        const payLoad = {
+                            "method": "nextQuestion",
+                            "game": game,
+                        }
+                        clients[clientId].connection.send(JSON.stringify(payLoad));
+                    }
                     if (game.clients[clientIndex].submits >= 3){
                         const payLoad = {
                             "method": "submit",
@@ -694,8 +830,20 @@ webSocket.on("connection", (ws, req) => {
                         // Get submits count for both players
                         const player1Submits = game.clients[0]?.submits || 0;
                         const player2Submits = game.clients[1]?.submits || 0;
-                        await setPlayerScores(gameId, player1Submits, player2Submits);
-                        const player1 = getUser()
+                        try {
+                            await setPlayerScores(gameId, player1Submits, player2Submits);
+                        } catch (error) {
+                            console.error("Error setting player scores:", error);
+                            // Handle error or rethrow if necessary
+                        }
+                        try {
+                            const currRanks = await getPlayerRanks(game.clients[0].clientId, game.clients[1].clientId);
+                            const newRanks = updateRanks(currRanks.player1Rank, currRanks.player2Rank, player1Submits, player2Submits);
+                            await updatePlayerRanks(game.clients[0].clientId, game.clients[1].clientId, newRanks.newPlayer1Rank, newRanks.newPlayer2Rank);
+                        } catch (error) {
+                            console.error("Error updating player ranks:", error);
+                            // Handle error or rethrow if necessary
+                        }                       
                         game.clients.forEach(client => {
                             clients[client.clientId].connection.send(JSON.stringify(payLoad));
                         });
