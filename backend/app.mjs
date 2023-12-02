@@ -15,13 +15,6 @@ const PORT = 4000;
 const app = express();
 app.use(express.json());
 
-// app.use(function (req, res, next) {
-//     res.header("Access-Control-Allow-Origin", process.env.FRONTEND);
-//     res.header("Access-Control-Allow-Headers", "Content-Type");
-//     res.header("Access-Control-Allow-Methods", "*");
-//     next();
-// });
-
 app.use(
     cors({
       origin: process.env.FRONTEND,
@@ -293,7 +286,7 @@ function getMatchHistory(username) {
               { $or: [{ player1: username }, { player2: username }] },
               { player2: { $ne: null, $ne: "" } }
             ]
-        }).toArray();
+        }).sort({ _id: -1 }).limit(20).toArray();
         if (!games) {
             return resolve(null);
         }

@@ -31,7 +31,7 @@ export function Leaderboard() {
         <button type="submit" className="Icon_Button" onClick={redirectHome}>
           <i className="bi bi-caret-left-fill Icon"></i>
         </button>
-        <div className="Page_Title">Top 50</div>
+        <div className="Page_Title">Leaderboard</div>
       </div>
       {users.map((user, index) => (
         <div key={index} className={`User mb-2 row justify-content-center align-items-center`}>
