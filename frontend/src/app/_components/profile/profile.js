@@ -1,5 +1,5 @@
 import  React, { useState, useEffect, useRef } from 'react';
-import Link from 'next/link'
+import { Rank } from "../rank/rank.js"
 import "./styles.css";
 
 const BronzeUB = 499;
@@ -21,18 +21,6 @@ export function Profile(props) {
         progress = 100; // MAX
     }
     return Math.floor(progress);
-  }
-
-  function rankClass() {
-    let rankTitle;
-    if (user.rank <= BronzeUB) {
-        rankTitle = "Bronze";
-    } else if (user.rank <= SilverUB) {
-        rankTitle = "Silver";
-    } else {
-        rankTitle = "Gold";
-    }
-    return rankTitle;
   }
 
   return (
@@ -75,7 +63,7 @@ export function Profile(props) {
             </svg>
         </div>
         <div className="col-md-2 d-flex flex-column justify-content-center align-items-center">
-            <div className={rankClass()}></div>
+            <Rank rank={user.rank}/>
             <div className="Rank_Number">{user.rank}</div>
         </div>
       </div>

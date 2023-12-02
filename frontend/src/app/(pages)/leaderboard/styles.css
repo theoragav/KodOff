@@ -1,0 +1,48 @@
+.Leaderboard .Page_Title {
+    color: #FFFBF5;
+    font-family: Josefin Sans;
+    font-size: 40px;
+    font-style: italic;
+    font-weight: 700;
+    line-height: normal;
+    letter-spacing: 0.45px;
+    text-transform: uppercase;
+}
+
+.Leaderboard .User {
+    color: #4FD2CA;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.06) 100%);
+    box-shadow: 0px 0px 2px 0px rgba(255, 251, 245, 0.50);
+    border-radius: 10px;
+
+    color: #FFFBF5;
+    font-family: Josefin Sans;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: normal;
+}
+
+.Leaderboard .Icon_Button {
+    display: flex;
+    padding: 10px 15px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 10px;
+    background: #FFFBF5;
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.25);
+    color: #222629;
+    font-size: 20px;
+    margin-right: 20px;
+}
+
+.Leaderboard .Pfp {
+    max-width: 13vh;
+    height: auto;
+    border-radius: 10px;
+}
+
+.Leaderboard .Number {
+    font-size: 40px;
+    font-weight: 700;
+}
