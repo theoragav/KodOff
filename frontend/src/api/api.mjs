@@ -9,7 +9,7 @@ function send(method, url, data){
 }
 
 export async function signUp(code) {
-  return await fetch(`http://localhost:4000/signUp/`, {
+  return await fetch(`${process.env.NEXT_PUBLIC_BACKEND}/signUp/`, {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({ code: code }),
@@ -22,7 +22,7 @@ export async function signUp(code) {
 }
 
 export async function login(code) {
-  return await fetch(`http://localhost:4000/login/`, {
+  return await fetch(`${process.env.NEXT_PUBLIC_BACKEND}/login/`, {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({ code: code }),
@@ -35,7 +35,7 @@ export async function login(code) {
 }
 
 export function logOut() {
-  fetch(`http://localhost:4000/logout/`, {
+  fetch(`${process.env.NEXT_PUBLIC_BACKEND}/logout/`, {
     method: 'GET',
     headers: {"Content-Type": "application/json"},
     credentials: 'include',
@@ -51,7 +51,33 @@ export function logOut() {
 }
 
 export async function loggedInUser() {
-  return await fetch(`http://localhost:4000/user/`, {
+  return await fetch(`${process.env.NEXT_PUBLIC_BACKEND}/user/`, {
+    method: "GET",
+    headers: {"Content-Type": "application/json"},
+    body: null,
+    credentials: 'include',
+  }).then((response) => {
+    return response.json();
+  }).then((data) => {
+    return data;
+  });
+}
+
+export async function getMatchHistory() {
+  return await fetch(`${process.env.NEXT_PUBLIC_BACKEND}/matchhistory/`, {
+    method: "GET",
+    headers: {"Content-Type": "application/json"},
+    body: null,
+    credentials: 'include',
+  }).then((response) => {
+    return response.json();
+  }).then((data) => {
+    return data;
+  });
+}
+
+export async function getLeaderboard() {
+  return await fetch(`${process.env.NEXT_PUBLIC_BACKEND}/leaderboard/`, {
     method: "GET",
     headers: {"Content-Type": "application/json"},
     body: null,

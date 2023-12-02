@@ -1,0 +1,26 @@
+.Bronze {
+    background-image: url("/assets/Rank_Bronze.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100%;
+    width: 10vh;
+    height: 10vh;
+}
+
+.Silver {
+    background-image: url("/assets/Rank_Silver.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100%;
+    width: 10vh;
+    height: 10vh;
+}
+
+.Gold {
+    background-image: url("/assets/Rank_Gold.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100%;
+    width: 10vh;
+    height: 10vh;
+}

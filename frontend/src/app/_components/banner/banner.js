@@ -1,24 +1,10 @@
 import  React, { useState, useEffect, useRef } from 'react';
+import { Rank } from "../rank/rank.js"
 import "./styles.css";
-
-const BronzeUB = 499;
-const SilverUB = 999;
 
 export function UserBanner(props) {
   const { user } = props;
   const { playerType } = props;
-
-  function rankClass() {
-    let rankTitle;
-    if (user.rank <= BronzeUB) {
-        rankTitle = "Bronze";
-    } else if (user.rank <= SilverUB) {
-        rankTitle = "Silver";
-    } else {
-        rankTitle = "Gold";
-    }
-    return rankTitle;
-  }
 
   function userTypeClass() {
     if (playerType == "user") {
@@ -48,7 +34,7 @@ export function UserBanner(props) {
               <img className="Pfp" src={user.pfp}/>
               <div className={`Username container-fluid ${userTextTypeClass()}`}>{user.username}</div>
           </div>
-          <div className={`${rankClass()}`}></div>
+          <Rank rank={user.rank}/>
         </div>
       ) : (
         <div className="Banner d-flex flex-column align-items-center container-fluid Waiting">

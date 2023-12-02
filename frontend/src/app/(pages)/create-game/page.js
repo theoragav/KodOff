@@ -5,7 +5,7 @@ import { loggedInUser } from "../../../api/api.mjs";
 import { Profile } from "../../_components/profile/profile.js"
 import "./styles.css";
 
-const wsUrl = 'ws://localhost:4000'; 
+const wsUrl = process.env.WS; 
 
 export default function CreateGame() {
   const router = useRouter();

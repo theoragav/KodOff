@@ -178,6 +178,36 @@ app.get("/user/", (req, res) => {
     return res.json(req.session.user);
 });
 
+app.get("/matchhistory/", (req, res) => {
+    getMatchHistory(req.session.user.username).then(async games => {
+        if (games) {
+            return res.json(games);
+        }
+        else {
+            return res.status(409).end("No games");
+        }
+    })
+    .catch(error => {
+        console.log(error);
+        return res.status(500).end("Internal Server Error");
+    });
+});
+
+app.get("/leaderboard/", (req, res) => {
+    getTop50().then(async users => {
+        if (users) {
+            return res.json(users);
+        }
+        else {
+            return res.status(409).end("No users");
+        }
+    })
+    .catch(error => {
+        console.log(error);
+        return res.status(500).end("Internal Server Error");
+    });
+});
+
 /* GitHub API Functions */
 function getAccessToken(code) {
     const params = `?client_id=${process.env.GITHUB_CLIENT_ID}&client_secret=${process.env.GITHUB_CLIENT_SECRET}&code=${code}`;
@@ -250,6 +280,38 @@ function addUser(data) {
             return reject(user);
         }
         return resolve(user);
+    })
+}
+
+function getMatchHistory(username) {
+    return new Promise(async(resolve, reject) => {
+        const games = await db.collection('games').find({
+            $and: [
+              { $or: [{ player1: username }, { player2: username }] },
+              { player2: { $ne: null, $ne: "" } }
+            ]
+        }).toArray();
+        if (!games) {
+            return resolve(null);
+        }
+        if (games instanceof Error) {
+            return reject(games);
+        }
+        return resolve(games);
+    })
+}
+
+function getTop50() {
+    return new Promise(async(resolve, reject) => {
+        const users = await db.collection('users').find().sort({ rank: -1 }).limit(50).toArray();
+        console.log(users);
+        if (!users) {
+            return resolve(null);
+        }
+        if (users instanceof Error) {
+            return reject(users);
+        }
+        return resolve(users);
     })
 }
 
