@@ -1,0 +1,17 @@
+.Create_Game {
+    gap: 30px;
+}
+
+.Create_Game .Content {
+    gap: 60px;
+}
+
+.Versus {
+    background-image: url("/assets/versus.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100%;
+
+    width: 20vh;
+    height: 25vh;
+}

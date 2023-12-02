@@ -1,0 +1,79 @@
+.Banner {
+    padding: 20px 0px 20px 0px !important;
+    margin: 0;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    height: 65vh;
+    gap: 10px;
+}
+
+.Banner .Pfp {
+    width: 100%;
+}
+
+.Banner .Username {
+    color: #FFFBF5;
+    font-family: Josefin Sans;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    text-transform: uppercase;
+
+    display: flex;
+    max-width: 100%;
+    padding: 10px 0px;
+    flex-direction: column;
+    align-items: center;
+}
+
+.Banner .Bronze {
+    background-image: url("/assets/Rank_Bronze.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100%;
+    width: 8vh;
+    height: 8vh;
+}
+
+.Banner .Silver {
+    background-image: url("/assets/Rank_Silver.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100%;
+    width: 8vh;
+    height: 8vh;
+}
+
+.Banner .Gold {
+    background-image: url("/assets/Rank_Gold.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100%;
+    width: 8vh;
+    height: 8vh;
+}
+
+.User {
+    background-image: url("/assets/user_banner.png");
+}
+
+.User_Username {
+    background: rgba(137, 207, 217, 0.40);
+}
+
+.Opponent {
+    background-image: url("/assets/opponent_banner.png");
+}
+
+.Opponent_Username {
+    background: rgba(234, 88, 88, 0.40);
+}
+
+.Waiting {
+    background-image: url("/assets/waiting_banner.png");
+}
+
+.Waiting_Username {
+    background: rgba(161, 161, 161, 0.40);
+}

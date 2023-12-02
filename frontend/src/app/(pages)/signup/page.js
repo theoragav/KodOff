@@ -1,0 +1,40 @@
+'use client'
+
+import  React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link'
+import "./styles.css";
+
+const GITHUB_CLIENT_ID = "519e665d1d70d75e371a";
+const GITHUB_REDIRECT_URI = "http://localhost:3000/";
+
+export function SignUp() {
+
+  function redirectToGithub() {
+    window.location.assign(`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_REDIRECT_URI}&scope=user&state=signup`);
+  }
+
+  return (
+    <div className="Access_Card container-fluid mt-5">
+      <div className="row d-flex gx-5">
+          <div className="Left_Container col-md-5 d-flex flex-column text-break text-center justify-content-center">
+            <div className="App d-flex align-items-center justify-content-center">
+              <div className="App_Logo"></div>
+              <div className="App_Name">KodOff</div>
+            </div>
+            <div className="Main_Slogan">3 problems, 2 coders, 1 winner</div>
+            <div className="Main_Description">Challenge your coding skills in real-time 1-on-1 duels by solving 3 coding problems under the clock!</div>
+            <div className="Main_Access d-flex flex-column align-items-center">
+              <button type="submit" className="mb-2 Main_Btn" onClick={redirectToGithub}>
+                <i className="bi bi-github Main_Icon"></i>
+                Sign Up with Github
+              </button>
+              <Link className="Main_Switch" href="/login">Already have an account?</Link>
+            </div>
+          </div>
+          <div className="col-md-7 Main_Illustration"></div>
+      </div>
+    </div>
+  );
+}
+
+export default SignUp;
