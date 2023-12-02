@@ -87,7 +87,7 @@ export default function Game() {
         // reset code block
         setCode(initialCode);
         // reset tests result
-        //   setTests(null);
+        setTests(null);
         // } else {
         //   setTests("Failed blabla cases");
         // }
@@ -109,6 +109,12 @@ export default function Game() {
         setErrorMessage(response.message);
         return; // Early return to prevent further processing
       }
+
+      // Handle wrong answer
+      if (response.method === "wrongAnswer") {
+        setTests(response.message);
+        return; // Early return to prevent further processing
+      }
     };
 
     newWs.onclose = () => {
@@ -122,7 +128,6 @@ export default function Game() {
   }, []);
 
   const joinGame = () => {
-    console.log("Joining game");
     const payload = {
       "method": "join",
       "clientId": clientId,
@@ -148,6 +153,7 @@ export default function Game() {
       "method": "submit",
       "clientId": clientId,
       "gameId": gameId,
+      "code": code
     };
     ws.current.send(JSON.stringify(payload));
   };

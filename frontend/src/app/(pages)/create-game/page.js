@@ -19,6 +19,16 @@ export default function CreateGame() {
   const [timeLeft, setTimeLeft] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
+  const resetGameState = () => {
+    setClientId(null);
+    setCreatorId(null);
+    setGameId(null);
+    setGame(null);
+    setWinner(null);
+    setTimeLeft(null);
+    setErrorMessage(null);
+  };
+
   useEffect(() => {
     // Check if user is logged in
     loggedInUser().then((data) => {
@@ -57,6 +67,7 @@ export default function CreateGame() {
       if (response.method === "submit"){
         setGame(response.game);
         setWinner(response.winner);
+        resetGameState();
       }
 
       if (response.method === "nextQuestion"){
@@ -66,6 +77,7 @@ export default function CreateGame() {
       if (response.method === "end"){
         setGame(response.game);
         setWinner(response.winner);
+        resetGameState();
       }
 
       // Handle timer updates
