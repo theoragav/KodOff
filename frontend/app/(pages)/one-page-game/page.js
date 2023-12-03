@@ -9,7 +9,7 @@ import { InGame } from "./../../_components/in-game/ingame.js"
 import { Result } from "./../../_components/result-overlay/result.js"
 import "./styles.css";
 
-const wsUrl = "ws://34.130.40.53:4000"; 
+const wsUrl = process.env.NEXT_PUBLIC_WS; 
 
 export default function Game() {
   const router = useRouter();

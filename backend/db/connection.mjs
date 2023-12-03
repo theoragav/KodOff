@@ -1,6 +1,6 @@
 import { MongoClient } from "mongodb";
 
-const DB_CONNECTION_STRING = "mongodb+srv://shannonanggab:nVWdKauh79sszvYb@kodoff.iyivfvn.mongodb.net/"
+const DB_CONNECTION_STRING = "mongodb://127.0.0.1:27017/KodOff"
 const client = new MongoClient(DB_CONNECTION_STRING);
 
 let connection;
