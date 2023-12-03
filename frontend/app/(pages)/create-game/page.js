@@ -1,8 +1,8 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { loggedInUser } from "../../../api/api.mjs";
-import { Profile } from "../../_components/profile/profile.js"
+import { loggedInUser } from "./../../../api/api.mjs";
+import { Profile } from "./../../_components/profile/profile.js"
 import "./styles.css";
 
 const wsUrl = process.env.WS; 
@@ -36,9 +36,13 @@ export default function CreateGame() {
       else router.push('/login');
     });
 
+    console.log("WebSocket URL inside useEffect:", wsUrl);
+
     // Initialize WebSocket connection
     const newWs = new WebSocket(wsUrl);
 
+    console.log("WebSocket instance:", newWs);
+    
     newWs.onopen = () => {
       console.log('WebSocket connection opened');
     };

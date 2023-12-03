@@ -2,7 +2,7 @@
 
 import  React, { useState, useEffect, useRef } from 'react';
 import "./styles.css";
-import { loggedInUser, getMatchHistory } from "../../../api/api.mjs";
+import { loggedInUser, getMatchHistory } from "./../../../api/api.mjs";
 import { useRouter } from 'next/navigation';
 
 export function History() {

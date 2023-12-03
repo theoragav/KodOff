@@ -1,15 +1,15 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { loggedInUser } from "../../../api/api.mjs";
-import { JoinGame } from "../../_components/join-game/joingame.js"
-import { CreateGame } from "../../_components/create-game/creategame"
-import { Versus } from "../../_components/versus/versus.js"
-import { InGame } from "../../_components/in-game/ingame.js"
-import { Result } from "../../_components/result-overlay/result.js"
+import { loggedInUser } from "./../../../api/api.mjs";
+import { JoinGame } from "./../../_components/join-game/joingame.js"
+import { CreateGame } from "./../../_components/create-game/creategame"
+import { Versus } from "./../../_components/versus/versus.js"
+import { InGame } from "./../../_components/in-game/ingame.js"
+import { Result } from "./../../_components/result-overlay/result.js"
 import "./styles.css";
 
-const wsUrl = 'ws://localhost:4000'; 
+const wsUrl = "ws://34.130.40.53:4000"; 
 
 export default function Game() {
   const router = useRouter();
@@ -47,8 +47,12 @@ export default function Game() {
         else router.push('/login');
     });
 
+    console.log("WebSocket URL inside useEffect:", wsUrl);
+
     // Initialize WebSocket connection
     const newWs = new WebSocket(wsUrl);
+
+    console.log("WebSocket instance:", newWs);
 
     newWs.onopen = () => {
       console.log('WebSocket connection opened');

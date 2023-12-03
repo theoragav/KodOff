@@ -7,9 +7,9 @@ export function CreateGame(props) {
   const { createGame, gamePin } = props;
   const uniqueGamePin = useRef(null);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(uniqueGamePin.current.innerText);
-  };
+  // const handleCopy = () => {
+  //   navigator.clipboard.writeText(uniqueGamePin.current.innerText);
+  // };
 
   const handleSubmit = (e) => {
     createGame();
@@ -23,9 +23,9 @@ export function CreateGame(props) {
           <div className="Divider"></div>
           <div className="Pin_Text" ref={uniqueGamePin}>{gamePin}</div>
         </div>
-        <button type="submit" className="Icon_Button" onClick={handleCopy}>
+        {/* <button type="submit" className="Icon_Button" onClick={handleCopy}>
           <i className="bi bi-clipboard Icon"></i>
-        </button>
+        </button> */}
       </div>
       <button type="submit" className="Join_Btn align-self-stretch w-100" onClick={handleSubmit}>Host Your Own Game</button>
     </div>

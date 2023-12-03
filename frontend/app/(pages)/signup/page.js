@@ -5,12 +5,12 @@ import Link from 'next/link'
 import "./styles.css";
 
 const GITHUB_CLIENT_ID = "519e665d1d70d75e371a";
-const GITHUB_REDIRECT_URI = "http://localhost:3000/";
+const GITHUB_REDIRECT_URI = "http://34.130.40.53";
 
 export function SignUp() {
 
   function redirectToGithub() {
-    window.location.assign(`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_REDIRECT_URI}&scope=user&state=signup`);
+    window.location.assign("https://github.com/login/oauth/authorize?client_id=" + GITHUB_CLIENT_ID + "&redirect_uri=" + GITHUB_REDIRECT_URI + "&scope=user&state=signup");
   }
 
   return (

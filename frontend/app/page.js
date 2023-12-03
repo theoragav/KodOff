@@ -3,7 +3,7 @@
 import  React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { signUp, login, logOut, loggedInUser } from "../api/api.mjs";
+import { signUp, login, logOut, loggedInUser } from "./../api/api.mjs";
 import { Profile } from "./_components/profile/profile.js";
 import "./styles.css";
 
@@ -54,7 +54,7 @@ export default function Page() {
           </div>
           <div className="Content row d-flex gx-5">
             <div className="Game_Menu col-md-5 d-flex flex-column align-items-start text-break mt-5">
-              <Link href="/one-page-game"><button type="submit" className="Menu_Button">Let's KodOff</button></Link>
+              <Link href="/one-page-game"><button type="submit" className="Menu_Button">Begin KodOff</button></Link>
               <Link href="/history"><button type="submit" className="Menu_Button">Match History</button></Link>
               <Link href="/leaderboard"><button type="submit" className="Menu_Button">Leaderboard</button></Link>
               <button type="submit" className="SubMenu_Button" onClick={logOutAccount}>Log Out</button>

@@ -1,7 +1,7 @@
 'use client'
 
 import  React, { useState, useEffect, useRef } from 'react';
-import { UserBanner } from "../banner/banner.js";
+import { UserBanner } from "./../banner/banner.js";
 import "./styles.css";
 
 export function Versus(props) {

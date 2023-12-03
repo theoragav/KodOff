@@ -1,5 +1,5 @@
 import  React, { useState, useEffect, useRef } from 'react';
-import { Rank } from "../rank/rank.js"
+import { Rank } from "./../rank/rank.js"
 import "./styles.css";
 
 export function UserBanner(props) {

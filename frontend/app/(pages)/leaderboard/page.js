@@ -2,9 +2,9 @@
 
 import  React, { useState, useEffect, useRef } from 'react';
 import "./styles.css";
-import { loggedInUser, getLeaderboard } from "../../../api/api.mjs";
+import { loggedInUser, getLeaderboard } from "./../../../api/api.mjs";
 import { useRouter } from 'next/navigation';
-import { Rank } from "../../_components/rank/rank.js"
+import { Rank } from "./../../_components/rank/rank.js"
 
 export function Leaderboard() {
   const router = useRouter();
@@ -19,6 +19,7 @@ export function Leaderboard() {
     getLeaderboard().then((data) => {
       if (data) setUsers(data);
     });
+    console.log("WebSocket URL inside useEffect:");
   }, []);
 
   const redirectHome = () => {
