@@ -4,7 +4,7 @@ import  React, { useState, useEffect, useRef } from 'react';
 import "./styles.css";
 
 export function CreateGame(props) {
-  const { createGame, gamePin } = props;
+  const { createGame, gamePin, hide } = props;
   const uniqueGamePin = useRef(null);
 
   // const handleCopy = () => {
@@ -23,11 +23,10 @@ export function CreateGame(props) {
           <div className="Divider"></div>
           <div className="Pin_Text" ref={uniqueGamePin}>{gamePin}</div>
         </div>
-        {/* <button type="submit" className="Icon_Button" onClick={handleCopy}>
-          <i className="bi bi-clipboard Icon"></i>
-        </button> */}
       </div>
-      <button type="submit" className="Join_Btn align-self-stretch w-100" onClick={handleSubmit}>Host Your Own Game</button>
+      {!hide && (
+        <button type="submit" className="Join_Btn align-self-stretch w-100" onClick={handleSubmit}>Host Your Own Game</button>
+      )}
     </div>
   )
 }
