@@ -20,6 +20,7 @@ export default function Game() {
   const initialCode = "def kodoff():";
   const [code, setCode] = useState(initialCode);
   const [tests, setTests] = useState(null);
+  const [hide, setHide] = useState(false);
 
   const ws = useRef(null);
   const [clientId, setClientId] = useState(null);
@@ -60,9 +61,10 @@ export default function Game() {
       // create
       if (response.method === "create") {
         setGameId(response.game.id);
-        console.log(gameId);
         setCreatorId(response.clientId);
         setGame(response.game);
+        Or.current.className = "d-none";
+        setHide(true);
       }
 
       // join
@@ -127,7 +129,6 @@ export default function Game() {
   };
 
   const createGame = () => {
-    Or.current.className = "d-none";
     JoinGameForm.current.className = "d-none";
     const payload = {
       "method": "create",
@@ -185,7 +186,10 @@ export default function Game() {
   return (
     <div>
       {Object.keys(user).length !== 0 ? (
-        <div className="d-flex flex-column mt-5 mb-4 justify-content-center">
+        <div className="OnePageGame d-flex flex-column mt-5 mb-4 justify-content-center">
+            {errorMessage && (
+              <div className="Error mb-3"><i className="bi bi-exclamation-triangle-fill Icon"></i>{errorMessage}</div>
+            )}
             {game?.clients && game.clients.length === 2 ? (
               <div>
               <InGame user={user} opponent={game.clients.find(client => client.clientId !== clientId).user || {}} 
@@ -204,10 +208,9 @@ export default function Game() {
               <div>
                 <div className="Page_Title mb-3">New Game</div>
                 <div className="Forms row d-flex justify-content-between align-items-center">
-                    <div className="col-md-5" ref={CreateGameForm}><CreateGame gamePin={gameId} createGame={()=>createGame()}/></div>
+                    <div className="col" ref={CreateGameForm}><CreateGame gamePin={gameId} createGame={()=>createGame()} hide={hide}/></div>
                     <div className="col-md-1 Or" ref={Or}>OR</div>
-                    {/* <div className="col-md-5" ref={JoinGameForm}><JoinGame joinGame={()=>joinGame()}/></div> */}
-                    <div ref={JoinGameForm} className="col-md-5 Option_Form d-flex flex-column justify-content-center align-items-center">
+                    <div ref={JoinGameForm} className="col Option_Form d-flex flex-column justify-content-center align-items-center">
                       <input type="text" placeholder="Enter Game Pin" className="Join_Input align-self-stretch" onChange={(e) => setJoinId(e.target.value)}/>
                       <button type="submit" className="Join_Btn align-self-stretch w-100" onClick={joinGame}>Join Another Game</button>
                     </div>
