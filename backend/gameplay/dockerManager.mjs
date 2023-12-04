@@ -7,9 +7,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 function sanitizePythonCode(scriptContent) {
-    // List of disallowed imports
-    const disallowedImports = ['os', 'sys', 'subprocess', 'socket', 'shutil'];
-    const disallowedImportRegex = new RegExp(`import\\s+(${disallowedImports.join('|')})`, 'g');
+    // Disallow all imports
+    const disallowedImportRegex = new RegExp(`import\\s+\\w+`, 'g');
 
     // Detect file I/O operations
     const fileOperationsRegex = /open\(|read\(|write\(/g;
@@ -79,7 +78,7 @@ export function execPythonScript(scriptContent, tests) {
         try {
             console.log(tests);
             const randomSeed = generateRandomString(10); // To prevent users from faking results
-            const userFunction = sanitizePythonCode(scriptContent);
+            const userFunction = sanitizePythonCode(scriptContent); // Sanitize user submitted script for security
             const sanitizedScriptContent = constructPythonScript(userFunction, tests.test_cases, tests.test_results, randomSeed)
             const tempPyDir = path.join(__dirname, 'tempPy');
             if (!fs.existsSync(tempPyDir)) {
@@ -98,6 +97,21 @@ export function execPythonScript(scriptContent, tests) {
                 '-v', `"${tempFilePath}:/usr/src/app/script.py"`,
                 'python-exec-env', 'python', '/usr/src/app/script.py'
             ];
+
+            /*
+            Docker Security measure flags:
+
+            --rm : removes the container when it exists to prevent unintentional container left running
+            --memory=100m : limits max amount of usable memory by contaiiner to 100mb
+            --cpus=0.5s : limits usable cpu by container to 0.5
+            --network none: disables network usage for contaiiner
+            --security-opt=no-new-privileges: ensures container privileges is not increased over time
+            --tmpfs', '/run:rw,noexec,nosuid,size=65536k:
+                rw: read write access within the scope of the temporary file system's /run directory inside of the container
+                noexec: execution of binaries from the temporary file system is disallowed
+                nosuid: set-user-ID and set-group-ID bits are ignored
+                size=65536k: limits the overall size of the temporary file system to 65536 kilobytes
+            */
     
             const command = `docker ${dockerArgs.join(' ')}`;
             const process = exec(command);
@@ -154,7 +168,7 @@ export function execPythonScript(scriptContent, tests) {
                 console.error(`Terminating Docker container ${containerName} due to timeout.`);
                 exec(`docker kill ${containerName}`);
                 process.killedByTimeout = true;
-            }, 12000);  // 12 seconds timeout
+            }, 12000);  // 12 seconds timeout to handle non terminating code (ex infinite loops)
 
         } catch (error) {
             return resolve({ status: false, output: error.message });
