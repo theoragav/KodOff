@@ -666,6 +666,23 @@ webSocket.on("connection", (ws, req) => {
 
     ws.on("open", () => console.log("opened!"));
     ws.on("close", () => {
+        // Check if the client is in any game
+        for (const [gameId, game] of Object.entries(games)) {
+            // Find if the current client is part of this game
+            const clientIndex = game.clients.findIndex(client => client.clientId === clientId);
+            // If the client is part of this game
+            if (clientIndex !== -1) {
+                // Remove this game from the list of active games
+                delete games[gameId];
+
+                // If there is a timer associated with this game, clear it
+                if (timers[gameId]) {
+                    clearInterval(timers[gameId].updateInterval);
+                    delete timers[gameId];
+                }
+                break;
+            }
+        }
         delete clients[clientId];
         console.log("closed!")
     });
