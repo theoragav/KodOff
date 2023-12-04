@@ -38,24 +38,17 @@ export default function Game() {
         else router.push('/login');
     });
 
-    console.log("WebSocket URL inside useEffect:", wsUrl);
 
     // Initialize WebSocket connection
     const newWs = new WebSocket(wsUrl);
 
-    console.log("WebSocket instance:", newWs);
-
-    newWs.onopen = () => {
-      console.log('WebSocket connection opened');
-    };
-
     newWs.onmessage = (message) => {
       const response = JSON.parse(message.data);
-      console.log('Received:', response);
 
       // connect
       if (response.method === "connect") {
         setClientId(response.clientId);
+        setErrorMessage(null);
       }
 
       // create
@@ -65,6 +58,7 @@ export default function Game() {
         setGame(response.game);
         Or.current.className = "d-none";
         setHide(true);
+        setErrorMessage(null);
       }
 
       // join
@@ -73,27 +67,32 @@ export default function Game() {
         setGameId(response.game.id);
         Or.current.className = "d-none";
         CreateGameForm.current.className = "d-none";
+        setErrorMessage(null);
       }
 
       if (response.method === "submit"){
         setGame(response.game);
         setWinner(response.winner);
+        setErrorMessage(null);
       }
 
       if (response.method === "nextQuestion"){
         setCode(initialCode);
         setTests(null);
         setGame(response.game);
+        setErrorMessage(null);
       }
 
       if (response.method === "end"){
         setGame(response.game);
         setWinner(response.winner);
+        setErrorMessage(null);
       }
 
       // Handle timer updates
       if (response.method === "timer") {
         setTimeLeft(response.timeLeft);
+        setErrorMessage(null);
       }
 
       // Handle error
@@ -105,12 +104,9 @@ export default function Game() {
       // Handle wrong answer
       if (response.method === "wrongAnswer") {
         setTests(response.message);
+        setErrorMessage(null);
         return; // Early return to prevent further processing
       }
-    };
-
-    newWs.onclose = () => {
-      console.log('WebSocket connection closed');
     };
 
     ws.current = newWs;
@@ -147,42 +143,6 @@ export default function Game() {
     ws.current.send(JSON.stringify(payload));
   };
   
-  useEffect(() => {
-    if (clientId) {
-      console.log("Client id set successfully " + clientId);
-    }
-  }, [clientId]);
-
-  useEffect(() => {
-    if (creatorId) {
-      console.log("Creator id set successfully " + creatorId);
-    }
-  }, [creatorId]);
-
-  useEffect(() => {
-    if (gameId) {
-      console.log("Game id set successfully " + gameId);
-    }
-  }, [gameId]);
-
-  useEffect(() => {
-    if (game) {
-      console.log("Game set successfully");
-    }
-  }, [game]);
-
-  useEffect(() => {
-    if (winner) {
-      console.log("Winner set successfully");
-    }
-  }, [winner]);
-
-  useEffect(() => {
-    if (timeLeft !== null) {
-      console.log("Timer updated: " + timeLeft + " milliseconds remaining");
-    }
-  }, [timeLeft]);
-
   return (
     <div>
       {Object.keys(user).length !== 0 ? (
