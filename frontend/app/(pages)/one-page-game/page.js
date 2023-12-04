@@ -14,16 +14,6 @@ const wsUrl = process.env.NEXT_PUBLIC_WS;
 export default function Game() {
   const router = useRouter();
   const [user, setUser] = useState({});
-  const [opponent, setOpponent] = useState({});
-  // const [opponent, setOpponent] = useState({
-  //   _id: '6557fefb1ed206278afed4aa',
-  //   username: 'abcde',
-  //   pfp: 'https://64.media.tumblr.com/f3807536e9926b27fae9741f7a7ab0df/0bbbff4652e354ea-dd/s1280x1920/a3e0d2027b2e86f5760c1d39db1402a1de78a5fa.png',    
-  //   rank: 500,
-  //   createdAt: 1700265723395       
-  // });
-  const [timer, setTimer] = useState(30);
-  const [problem, setProblem] = useState("Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.");
   const CreateGameForm = useRef(null);
   const Or = useRef(null);
   const JoinGameForm = useRef(null);
@@ -79,6 +69,8 @@ export default function Game() {
       if (response.method === "join"){
         setGame(response.game);
         setGameId(response.game.id);
+        Or.current.className = "d-none";
+        CreateGameForm.current.className = "d-none";
       }
 
       if (response.method === "submit"){
@@ -87,14 +79,8 @@ export default function Game() {
       }
 
       if (response.method === "nextQuestion"){
-        // replace logic with if the code submitted is correct
-        // reset code block
         setCode(initialCode);
-        // reset tests result
         setTests(null);
-        // } else {
-        //   setTests("Failed blabla cases");
-        // }
         setGame(response.game);
       }
 
@@ -138,8 +124,6 @@ export default function Game() {
       "gameId": joinId,
     };
     ws.current.send(JSON.stringify(payload));
-    Or.current.className = "d-none";
-    CreateGameForm.current.className = "d-none";
   };
 
   const createGame = () => {

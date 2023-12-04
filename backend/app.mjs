@@ -665,7 +665,10 @@ webSocket.on("connection", (ws, req) => {
     clients[clientId] = { "connection": ws };
 
     ws.on("open", () => console.log("opened!"));
-    ws.on("close", () => console.log("closed!"));
+    ws.on("close", () => {
+        delete clients[clientId];
+        console.log("closed!")
+    });
     ws.on("message", async (message) => {
         console.log("message");
         const result = JSON.parse(message);
@@ -790,7 +793,7 @@ webSocket.on("connection", (ws, req) => {
             // If this is the second player joining, start the timer after notification
             if (game.clients.length === 2) {
                 // Start the game timer here
-                startTimer(gameId, 150); // Assuming a 10-second game for example
+                startTimer(gameId, 5); // Assuming a 10-second game for example
             }
         }
 
