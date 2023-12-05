@@ -4,8 +4,8 @@ import React, { useRef } from "react";
 import Link from 'next/link'
 import "./styles.css";
 
-const GITHUB_CLIENT_ID = "519e665d1d70d75e371a";
-const GITHUB_REDIRECT_URI = "http://34.130.40.53";
+const GITHUB_CLIENT_ID = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
+const GITHUB_REDIRECT_URI = process.env.NEXT_PUBLIC_GITHUB_REDIRECT_URI;
 
 export function Login() {
 

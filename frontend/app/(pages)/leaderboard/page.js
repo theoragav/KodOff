@@ -19,7 +19,6 @@ export function Leaderboard() {
     getLeaderboard().then((data) => {
       if (data) setUsers(data);
     });
-    console.log("WebSocket URL inside useEffect:");
   }, []);
 
   const redirectHome = () => {

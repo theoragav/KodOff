@@ -469,7 +469,6 @@ async function getThreeRandomQuestions() {
             { $project: { _id: 1, desc: 1 } }
         ]).toArray();
 
-        console.log(questions);
         // Check if three questions were retrieved
         if (questions.length < 3) {
             throw new Error("Not enough questions in the database.");
@@ -614,7 +613,6 @@ async function evaluateWinneronTimerEnd(gameId) {
 function findGameForClient(clientId) {
     for (const gameId in games) {
       const game = games[gameId];
-      console.log("on game: "+ game);
       const client = game.clients.find((client) => client.clientId === clientId);
       if (client) {
         // The client is in this game
@@ -628,7 +626,6 @@ function findGameForClient(clientId) {
 /* For python script execution */
 async function getProblemTestsForUser(clientId) {
     try {
-        console.log("finding game for "+ clientId);
         const game = findGameForClient(clientId);
         // Check if the client is in a game
         if (!game) {
@@ -651,7 +648,6 @@ async function getProblemTestsForUser(clientId) {
             throw new Error("Problem tests not found in the database.");
         }
 
-        console.log("problem tests: " + problemTests);
         return problemTests;
     } catch (error) {
         throw error; // Rethrow the error to be handled by the caller
@@ -665,33 +661,34 @@ webSocket.on("connection", (ws, req) => {
     clients[clientId] = { "connection": ws };
 
     ws.on("open", () => console.log("opened!"));
-    ws.on("close", () => console.log("closed!"));
+    ws.on("close", () => {
+        // Check if the client is in any game
+        for (const [gameId, game] of Object.entries(games)) {
+            // Find if the current client is part of this game
+            const clientIndex = game.clients.findIndex(client => client.clientId === clientId);
+            // If the client is part of this game
+            if (clientIndex !== -1) {
+                // Remove this game from the list of active games
+                delete games[gameId];
+
+                // If there is a timer associated with this game, clear it
+                if (timers[gameId]) {
+                    clearInterval(timers[gameId].updateInterval);
+                    delete timers[gameId];
+                }
+                break;
+            }
+        }
+        delete clients[clientId];
+        console.log("closed!")
+    });
     ws.on("message", async (message) => {
         console.log("message");
         const result = JSON.parse(message);
-        console.log(result);
 
         // user wants to create game
         if (result.method === "create"){
             const clientId = result.clientId;
-            // // Check if the user is already in an ongoing game
-            // let isAlreadyInGame = false;
-            // for (const game of Object.values(games)) {
-            //     if (game.clients.some(client => client.clientId === clientId)) {
-            //         isAlreadyInGame = true;
-            //         break;
-            //     }
-            // }
-
-            // if (isAlreadyInGame) {
-            //     // Handle the situation when the user is already in a game
-            //     const errorPayload = {
-            //         "method": "error",
-            //         "message": "Cannot create a new game while already in an ongoing game."
-            //     };
-            //     clients[clientId].connection.send(JSON.stringify(errorPayload));
-            //     return;
-            // }
 
             const gameId = guid();
             await addGame(gameId, clientId);
@@ -769,7 +766,6 @@ webSocket.on("connection", (ws, req) => {
 
             // join game
             const user = await getUser(clientId);
-            console.log("second user found" + user + "for client id: " + clientId);
 
             await updateGamePlayer2(gameId, clientId);
             const problems = await getThreeRandomQuestions();
