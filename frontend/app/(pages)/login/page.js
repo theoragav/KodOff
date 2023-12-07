@@ -10,7 +10,7 @@ const GITHUB_REDIRECT_URI = process.env.NEXT_PUBLIC_GITHUB_REDIRECT_URI;
 export function Login() {
 
   function redirectToGithub() {
-    window.location.assign("https://github.com/login/oauth/authorize?client_id=" + GITHUB_CLIENT_ID + "&redirect_uri=" + GITHUB_REDIRECT_URI + "&scope=user&state=login");
+    window.location.assign(`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_REDIRECT_URI}&state=login`);
   }
 
   return (
