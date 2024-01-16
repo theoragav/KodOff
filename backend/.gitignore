@@ -11,4 +11,4 @@ db
 # python runner
 gameplay/tempPy/
 
-.emv
+.env
