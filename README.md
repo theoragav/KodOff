@@ -1,14 +1,5 @@
 # __KodOff__
 
-## Project URL
-http://kodoff.io
-
-http://kodoff.net  
-
-http://34.130.40.53/
-
-(all 3 links point to the same deployment, we had multiple domains as one of them took a while to forward properly)
-
 ## Project Video URL 
 
 KodOff.io - The True Online Competitive Programming Experience - CSCC09 Project Fall 2023
