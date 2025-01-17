@@ -11,6 +11,18 @@ https://youtu.be/NPZUMc_nb2E?si=zxW5fVklVdjoatXN
 ### Description
 KodOff is a real-time online competitive programming 1-on-1 game where each player has to solve 3 given programming prompts within 2 minutes and 30 seconds. Our goal is for users to have fun and engage in real-time coding challenges, showcasing their problem-solving abilities in a time-crunch environment.
 
+![K1](https://github.com/user-attachments/assets/0c5a0210-cec0-4c1b-a1da-e8c19833d7b1)
+![K2 5](https://github.com/user-attachments/assets/40aedae9-46ff-46a1-b77a-9ecb3f07b649)
+![K2](https://github.com/user-attachments/assets/0f75b0be-6198-419b-b14e-12fe5a62e2b1)
+![K3](https://github.com/user-attachments/assets/306ee321-a0c6-4adb-8d92-9d96687c3839)
+![K4](https://github.com/user-attachments/assets/8e6dece6-39a4-4f6a-a66e-1c74ebe56d9c)
+![K5](https://github.com/user-attachments/assets/b7b6d890-eb1c-49aa-8ec8-d6868cccef8e)
+![K6](https://github.com/user-attachments/assets/294a7b4b-ecf9-447d-b77d-71c4fdce330b)
+![K7](https://github.com/user-attachments/assets/fefb5a38-dff3-4b44-935f-92ba448714d0)
+![K8](https://github.com/user-attachments/assets/04f54583-875b-4ddc-b82e-03dfc29c3991)
+![K9](https://github.com/user-attachments/assets/744acd8d-82ec-4513-9214-9e464316d3dd)
+
+
 ### Features
 **Authentication:**
    - GitHub account-based authentication for quick sign up, log in, and log out processes.
